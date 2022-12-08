@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.appModuleChanges = exports.createMaterialModule = exports.createCustomValidator = exports.createLoginModule = exports.editAppRouting = exports.editAppHtml = void 0;
-const constants_1 = require("../constants");
+const constants_1 = require("../../constants");
 const fs_1 = __importDefault(require("fs"));
 const rxjs_1 = require("rxjs");
 const directory = constants_1.angularDirPathForDownload + '/common';

@@ -13,11 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const app_component_edit_1 = require("./angular-setup/file-base-edit/app-component-edit");
 const login_code_add_1 = require("./angular-setup/file-base-edit/login-code-add");
 const index_1 = require("./angular-setup/index");
+const node_setup_1 = require("./node-setup");
 const app = (0, express_1.default)();
 const port = 3000;
+app.use((0, cors_1.default)()); // include before other routes
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
@@ -44,6 +47,15 @@ app.get('/login-file-code-add', (req, res) => __awaiter(void 0, void 0, void 0, 
         console.log('result', result);
         if (result)
             res.send('Successfully inserted login module');
+        else
+            res.send('API Failed');
+    });
+}));
+app.get('/login-api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, node_setup_1.ApiSetting)().subscribe((result) => {
+        console.log('result', result);
+        if (result)
+            res.send('Successfully created api');
         else
             res.send('API Failed');
     });

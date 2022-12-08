@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginStructure = exports.loginService = exports.loginComponent = exports.loginHtml = void 0;
-const constants_1 = require("../constants");
+const constants_1 = require("../../constants");
 const fs_1 = __importDefault(require("fs"));
 const rxjs_1 = require("rxjs");
 function loginHtml() {
@@ -147,7 +147,7 @@ function loginService() {
       providedIn: 'root'
     })
     export class LoginService {
-        apiURL='http://localhost:3000/'
+        apiURL='http://localhost:4500/'
       constructor(private httpClient: HttpClient) { }
       public login(loginObj:any): Observable<boolean> {
         const url = this.apiURL + 'login';

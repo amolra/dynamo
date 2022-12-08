@@ -8,7 +8,7 @@ import {
   basePath,
   dir,
   projectFolder,
-} from './constants';
+} from '../constants';
 
 export function createFolders(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
@@ -58,11 +58,11 @@ export function changeDir(dirName: string): Observable<boolean> {
 export function createprojectStructure(): Observable<boolean> {
   const subToReturn = new Subject<boolean>();
 
-  createFolders().subscribe((res) => {
+  createFolders().subscribe((res: boolean) => {
     if (res) {
-      changeDir(angularDir).subscribe((result) => {
+      changeDir(angularDir).subscribe((result: boolean) => {
         if (result) {
-          install().subscribe((resultInstall) => {
+          install().subscribe((resultInstall: boolean) => {
             if (resultInstall) {
               subToReturn.next(true);
             }

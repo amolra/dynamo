@@ -1,4 +1,4 @@
-import { angularDirPathForDownload } from '../constants';
+import { angularDirPathForDownload } from '../../constants';
 import fs from 'fs';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 export function loginHtml(): Observable<boolean> {
@@ -155,7 +155,7 @@ export function loginService(): Observable<boolean> {
       providedIn: 'root'
     })
     export class LoginService {
-        apiURL='http://localhost:3000/'
+        apiURL='http://localhost:4500/'
       constructor(private httpClient: HttpClient) { }
       public login(loginObj:any): Observable<boolean> {
         const url = this.apiURL + 'login';
@@ -175,11 +175,11 @@ export function loginService(): Observable<boolean> {
 export function loginStructure(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
 
-  loginHtml().subscribe((res) => {
+  loginHtml().subscribe((res: boolean) => {
     if (res) {
-      loginComponent().subscribe((result) => {
+      loginComponent().subscribe((result: boolean) => {
         if (result) {
-          loginService().subscribe((resultInstall) => {
+          loginService().subscribe((resultInstall: boolean) => {
             if (resultInstall) {
               subToReturn.next(true);
             }

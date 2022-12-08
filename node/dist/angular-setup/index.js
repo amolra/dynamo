@@ -7,7 +7,7 @@ exports.createprojectStructure = exports.changeDir = exports.install = exports.c
 const rxjs_1 = require("rxjs");
 const shelljs_1 = require("shelljs");
 const process_1 = __importDefault(require("process"));
-const constants_1 = require("./constants");
+const constants_1 = require("../constants");
 function createFolders() {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
     let fs = require('fs');

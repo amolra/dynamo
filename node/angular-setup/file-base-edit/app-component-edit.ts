@@ -1,4 +1,4 @@
-import { angularDirPathForDownload } from '../constants';
+import { angularDirPathForDownload } from '../../constants';
 import fs from 'fs';
 import { BehaviorSubject, Observable } from 'rxjs';
 const directory = angularDirPathForDownload + '/common';
@@ -264,16 +264,16 @@ export function createMaterialModule(): Observable<boolean> {
 export function appModuleChanges(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
 
-  editAppHtml().subscribe((res) => {
+  editAppHtml().subscribe((res: boolean) => {
     if (res) {
-      createMaterialModule().subscribe((materialOutPut) => {
+      createMaterialModule().subscribe((materialOutPut: boolean) => {
         if (materialOutPut) {
-          editAppRouting().subscribe((result) => {
+          editAppRouting().subscribe((result: boolean) => {
             if (result) {
-              createLoginModule().subscribe((resultCreation) => {
+              createLoginModule().subscribe((resultCreation: boolean) => {
                 if (resultCreation) {
                   createCustomValidator().subscribe(
-                    (resultCreateCustomValidator) => {
+                    (resultCreateCustomValidator: boolean) => {
                       if (resultCreateCustomValidator) {
                         subToReturn.next(true);
                       }
