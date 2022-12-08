@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.angularDirPathForDownload = exports.angularDir = exports.dir = exports.baseDirName = exports.projectFolder = exports.basePath = void 0;
-exports.basePath = 'd:/';
-exports.projectFolder = 'dynamo';
+exports.basePath = 'd:/dynamo-project/dynamo/';
+exports.projectFolder = 'node';
 exports.baseDirName = 'codes';
 exports.dir = '../' + exports.baseDirName;
 exports.angularDir = 'angular-code';

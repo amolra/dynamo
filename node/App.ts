@@ -10,21 +10,21 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 app.get('/project-setup', async (req, res) => {
-  await createprojectStructure().subscribe((result) => {
+  await createprojectStructure().subscribe((result: boolean) => {
     console.log('result', result);
     if (result) res.send('Successfully installed');
     else res.send('API Failed');
   });
 });
 app.get('/app-file-code-add', async (req, res) => {
-  await appModuleChanges().subscribe((result) => {
+  await appModuleChanges().subscribe((result: boolean) => {
     console.log('result', result);
     if (result) res.send('Successfully inserted app module');
     else res.send('API Failed');
   });
 });
 app.get('/login-file-code-add', async (req, res) => {
-  await loginStructure().subscribe((result) => {
+  await loginStructure().subscribe((result: boolean) => {
     console.log('result', result);
     if (result) res.send('Successfully inserted login module');
     else res.send('API Failed');
