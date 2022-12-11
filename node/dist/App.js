@@ -21,11 +21,15 @@ const node_setup_1 = require("./node-setup");
 const app = (0, express_1.default)();
 const port = 3000;
 app.use((0, cors_1.default)()); // include before other routes
+app.use(express_1.default.json());
+app.use(express_1.default.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
-app.get('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, index_1.createprojectStructure)().subscribe((result) => {
+app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('req.body', req.body);
+    const { parentModuleName, newModuleName, componentName } = req.body;
+    yield (0, index_1.createprojectStructure)(parentModuleName, newModuleName, componentName).subscribe((result) => {
         console.log('result', result);
         if (result)
             res.send('Successfully installed');

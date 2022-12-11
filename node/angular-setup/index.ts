@@ -8,12 +8,14 @@ import {
   basePath,
   dir,
   projectFolder,
+  nodeDir,
+  angularDirPathForDownload,
 } from '../constants';
 
 export function createFolders(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
-  let fs = require('fs');
-  let childDirectories = [dir + '/' + angularDir, dir + '/nodejs-code'];
+  const fs = require('fs');
+  let childDirectories = [dir + '/' + angularDir, dir + '/' + nodeDir];
   let i = 0;
   childDirectories.forEach((directory) => {
     if (!fs.existsSync(directory)) {
@@ -32,7 +34,96 @@ export function install(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
 
   exec(
-    basePath + projectFolder + '/angular-setup/install.sh',
+    basePath +
+      projectFolder +
+      '/angular-setup/install.sh ' +
+      basePath +
+      baseDirName +
+      '/' +
+      angularDir,
+    (error, stdout, stderr) => {
+      if (error) {
+        console.log(`error: ${error}`);
+        // return;
+      }
+      if (stderr) {
+        console.log(`stderr: ${stderr}`);
+        // return;
+      }
+      console.log(`stdout: ${stdout}`);
+      subToReturn.next(true);
+    }
+  );
+  return subToReturn.asObservable();
+}
+export function createModules(
+  parentModule: string,
+  newModule: string
+): Observable<boolean> {
+  const subToReturn = new BehaviorSubject<boolean>(false);
+  console.log(
+    basePath +
+      projectFolder +
+      '/angular-setup/module-creation.sh ' +
+      angularDirPathForDownload +
+      ' ' +
+      parentModule +
+      ' ' +
+      newModule
+  );
+  exec(
+    basePath +
+      projectFolder +
+      '/angular-setup/module-creation.sh ' +
+      angularDirPathForDownload +
+      ' ' +
+      parentModule +
+      ' ' +
+      newModule,
+    (error, stdout, stderr) => {
+      if (error) {
+        console.log(`error: ${error}`);
+        return;
+      }
+      if (stderr) {
+        console.log(`stderr: ${stderr}`);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+      subToReturn.next(true);
+    }
+  );
+  return subToReturn.asObservable();
+}
+export function createComponentService(
+  parentModule: string,
+  newModule: string,
+  componentName: string
+): Observable<boolean> {
+  const subToReturn = new BehaviorSubject<boolean>(false);
+  console.log(
+    basePath +
+      projectFolder +
+      '/angular-setup/component-creation.sh ' +
+      angularDirPathForDownload +
+      ' ' +
+      parentModule +
+      ' ' +
+      newModule +
+      ' ' +
+      componentName
+  );
+  exec(
+    basePath +
+      projectFolder +
+      '/angular-setup/component-creation.sh ' +
+      angularDirPathForDownload +
+      ' ' +
+      parentModule +
+      ' ' +
+      newModule +
+      ' ' +
+      componentName,
     (error, stdout, stderr) => {
       if (error) {
         console.log(`error: ${error}`);
@@ -55,7 +146,11 @@ export function changeDir(dirName: string): Observable<boolean> {
   return subToReturn.asObservable();
 }
 
-export function createprojectStructure(): Observable<boolean> {
+export function createprojectStructure(
+  parentModule: string,
+  newModule: string,
+  componentName: string
+): Observable<boolean> {
   const subToReturn = new Subject<boolean>();
 
   createFolders().subscribe((res: boolean) => {
@@ -64,7 +159,21 @@ export function createprojectStructure(): Observable<boolean> {
         if (result) {
           install().subscribe((resultInstall: boolean) => {
             if (resultInstall) {
-              subToReturn.next(true);
+              createModules(parentModule, newModule).subscribe(
+                (resultcreateModules: boolean) => {
+                  if (resultcreateModules) {
+                    createComponentService(
+                      parentModule,
+                      newModule,
+                      componentName
+                    ).subscribe((resultcreateComponentService: boolean) => {
+                      if (resultcreateComponentService) {
+                        subToReturn.next(true);
+                      }
+                    });
+                  }
+                }
+              );
             }
           });
         }

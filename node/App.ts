@@ -8,11 +8,19 @@ import { ApiSetting, packageEdit } from './node-setup';
 const app = express();
 const port = 3000;
 app.use(cors()); // include before other routes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
-app.get('/project-setup', async (req, res) => {
-  await createprojectStructure().subscribe((result: boolean) => {
+app.post('/project-setup', async (req, res) => {
+  console.log('req.body', req.body);
+  const { parentModuleName, newModuleName, componentName } = req.body;
+  await createprojectStructure(
+    parentModuleName,
+    newModuleName,
+    componentName
+  ).subscribe((result: boolean) => {
     console.log('result', result);
     if (result) res.send('Successfully installed');
     else res.send('API Failed');
