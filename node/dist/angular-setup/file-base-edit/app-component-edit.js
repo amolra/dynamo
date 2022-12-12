@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.appModuleChanges = exports.createMaterialModule = exports.createCustomValidator = exports.createLoginModule = exports.editAppRouting = exports.editAppHtml = void 0;
+exports.appModuleChanges = exports.addModulesInAppModule = exports.createMaterialModule = exports.createCustomValidator = exports.createLoginModule = exports.editAppRouting = exports.editAppHtml = void 0;
 const constants_1 = require("../../constants");
 const fs_1 = __importDefault(require("fs"));
 const rxjs_1 = require("rxjs");
@@ -253,6 +253,31 @@ function createMaterialModule() {
     return subToReturn.asObservable();
 }
 exports.createMaterialModule = createMaterialModule;
+function addModulesInAppModule() {
+    const subToReturn = new rxjs_1.BehaviorSubject(false);
+    const appModuleFile = constants_1.angularDirPathForDownload + '/app.module.ts';
+    console.log(appModuleFile);
+    // Use fs.readFile() method to read the file
+    const data = fs_1.default.readFileSync(appModuleFile).toString().split('\n');
+    if (data.findIndex((ele) => ele.includes('BrowserAnimationsModule')) === -1) {
+        const lastIndex = data
+            .reverse()
+            .findIndex((ele) => ele.includes('import {'));
+        const lastModuleName = data[lastIndex].substr(data[lastIndex].indexOf('{') + 1, data[lastIndex].indexOf('}') - data[lastIndex].indexOf('{') - 1);
+        console.log('lastModuleName', lastModuleName);
+        data.splice(lastIndex, 0, `import { BrowserAnimationsModule } from '@angular/platform-browser/animations';`);
+        const lastIndexPrevImports = data.findIndex((ele) => ele.includes(lastModuleName.trim()));
+        data.splice(lastIndexPrevImports + 1, 0, `BrowserAnimationsModule,`);
+        data.reverse();
+        const text = data.join('\n');
+        // Display the file content
+        fs_1.default.writeFileSync(appModuleFile, text, 'utf-8');
+        subToReturn.next(true);
+    }
+    console.log('write file complete');
+    return subToReturn.asObservable();
+}
+exports.addModulesInAppModule = addModulesInAppModule;
 function appModuleChanges() {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
     editAppHtml().subscribe((res) => {
@@ -265,7 +290,9 @@ function appModuleChanges() {
                                 if (resultCreation) {
                                     createCustomValidator().subscribe((resultCreateCustomValidator) => {
                                         if (resultCreateCustomValidator) {
-                                            subToReturn.next(true);
+                                            addModulesInAppModule().subscribe((resultAddModulesInAppModule) => {
+                                                subToReturn.next(true);
+                                            });
                                         }
                                     });
                                 }

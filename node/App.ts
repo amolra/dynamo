@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import { appModuleChanges } from './angular-setup/file-base-edit/app-component-edit';
+import {
+  addModulesInAppModule,
+  appModuleChanges,
+} from './angular-setup/file-base-edit/app-component-edit';
 import { loginStructure } from './angular-setup/file-base-edit/login-code-add';
 import { createprojectStructure } from './angular-setup/index';
 import { ApiSetting, packageEdit } from './node-setup';
@@ -23,6 +26,13 @@ app.post('/project-setup', async (req, res) => {
   ).subscribe((result: boolean) => {
     console.log('result', result);
     if (result) res.send('Successfully installed');
+    else res.send('API Failed');
+  });
+});
+app.get('/add-modules-in-app', async (req, res) => {
+  await addModulesInAppModule().subscribe((result: boolean) => {
+    console.log('result', result);
+    if (result) res.send('reading app module');
     else res.send('API Failed');
   });
 });

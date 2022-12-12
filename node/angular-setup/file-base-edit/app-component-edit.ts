@@ -1,6 +1,6 @@
 import { angularDirPathForDownload } from '../../constants';
 import fs from 'fs';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 const directory = angularDirPathForDownload + '/common';
 export function editAppHtml(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
@@ -261,6 +261,40 @@ export function createMaterialModule(): Observable<boolean> {
   console.log('write file complete');
   return subToReturn.asObservable();
 }
+export function addModulesInAppModule(): Observable<boolean> {
+  const subToReturn = new BehaviorSubject<boolean>(false);
+  const appModuleFile = angularDirPathForDownload + '/app.module.ts';
+  console.log(appModuleFile);
+  // Use fs.readFile() method to read the file
+  const data = fs.readFileSync(appModuleFile).toString().split('\n');
+  if (data.findIndex((ele) => ele.includes('BrowserAnimationsModule')) === -1) {
+    const lastIndex = data
+      .reverse()
+      .findIndex((ele) => ele.includes('import {'));
+    const lastModuleName = data[lastIndex].substr(
+      data[lastIndex].indexOf('{') + 1,
+      data[lastIndex].indexOf('}') - data[lastIndex].indexOf('{') - 1
+    );
+    console.log('lastModuleName', lastModuleName);
+    data.splice(
+      lastIndex,
+      0,
+      `import { BrowserAnimationsModule } from '@angular/platform-browser/animations';`
+    );
+
+    const lastIndexPrevImports = data.findIndex((ele) =>
+      ele.includes(lastModuleName.trim())
+    );
+    data.splice(lastIndexPrevImports + 1, 0, `BrowserAnimationsModule,`);
+    data.reverse();
+    const text = data.join('\n');
+    // Display the file content
+    fs.writeFileSync(appModuleFile, text, 'utf-8');
+    subToReturn.next(true);
+  }
+  console.log('write file complete');
+  return subToReturn.asObservable();
+}
 export function appModuleChanges(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
 
@@ -275,7 +309,11 @@ export function appModuleChanges(): Observable<boolean> {
                   createCustomValidator().subscribe(
                     (resultCreateCustomValidator: boolean) => {
                       if (resultCreateCustomValidator) {
-                        subToReturn.next(true);
+                        addModulesInAppModule().subscribe(
+                          (resultAddModulesInAppModule: boolean) => {
+                            subToReturn.next(true);
+                          }
+                        );
                       }
                     }
                   );

@@ -37,6 +37,15 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
             res.send('API Failed');
     });
 }));
+app.get('/add-modules-in-app', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, app_component_edit_1.addModulesInAppModule)().subscribe((result) => {
+        console.log('result', result);
+        if (result)
+            res.send('reading app module');
+        else
+            res.send('API Failed');
+    });
+}));
 app.get('/app-file-code-add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, app_component_edit_1.appModuleChanges)().subscribe((result) => {
         console.log('result', result);
