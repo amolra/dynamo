@@ -1,0 +1,20 @@
+<div class="container mt-3">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Module Name</th>
+        <th>Component Name</th>
+        <th>Component Type</th>
+        <th>Field Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let details of tableData">
+        <td>{{ details.moduleName }}</td>
+        <td>{{ details.componentName }}</td>
+        <td>{{ details.componentType }}</td>
+        <td>{{ details.fieldDetails | json }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

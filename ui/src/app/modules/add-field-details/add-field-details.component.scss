@@ -1,0 +1,31 @@
+::ng-deep {
+  .field-create-page {
+    font-family: "Segoe_UI_Semi_bold";
+    margin: auto;
+    width: 95%;
+    border: 1px solid #11142e;
+    border-radius: rem(6px);
+    padding: rem(25px) !important;
+    mat-label {
+      font-size: rem(13px);
+      color: #656a89;
+      margin-bottom: rem(7px);
+    }
+    mat-error {
+      color: red;
+      font-family: "Conv_segoeui";
+      padding-left: rem(20px);
+      font-size: rem(13px);
+      background-position-y: center;
+      display: flex;
+      padding-bottom: rem(2px);
+    }
+    input {
+      margin: auto;
+      width: 100%;
+      border: 1px solid #b4bcd1;
+      font-size: rem(14px);
+      color: #11142e;
+    }
+  }
+}
