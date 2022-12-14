@@ -16,6 +16,9 @@
       font-size: rem(13px);
       color: #656a89;
       margin-bottom: rem(7px);
+      .mandatory-icon {
+        color: red;
+      }
     }
     mat-error {
       color: red;
@@ -26,18 +29,17 @@
       display: flex;
       padding-bottom: rem(2px);
     }
-    ::ng-deep {
-      .add-button {
-        margin: 9px 5px 0px 5px;
-        width: 25% !important;
-        background-color: #1c4e9d;
-        color: white;
-        font-weight: 250;
-        font-family: "Segoe UI";
-        z-index: 100;
-        padding: rem(10px);
-        float: right;
-      }
+
+    .add-button {
+      margin: 9px 5px 0px 5px;
+      width: 25% !important;
+      background-color: #1c4e9d;
+      color: white;
+      font-weight: 250;
+      font-family: "Segoe UI";
+      z-index: 100;
+      padding: rem(10px);
+      float: right;
     }
     .table-border {
       border-top: 1px solid #11142e;

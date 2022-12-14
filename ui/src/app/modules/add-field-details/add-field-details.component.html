@@ -1,8 +1,14 @@
-<div class="field-create-page" *ngIf="addFieldForm" [formGroup]="addFieldForm">
+<div
+  class="field-create-page p-3 m-1"
+  *ngIf="addFieldForm"
+  [formGroup]="addFieldForm"
+>
   <div class="row">
     <div class="col-12 form-group">
-      <mat-label>Field Name FET</mat-label>
-      <input class="form-control" formControlName="fieldNameFET" />
+      <mat-label
+        >Field Name FET<span class="mandatory-icon"> *</span></mat-label
+      >
+      <input matInput class="form-control" formControlName="fieldNameFET" />
       <mat-error
         *ngIf="
           f.fieldNameFET &&
@@ -17,8 +23,10 @@
   </div>
   <div class="row">
     <div class="col-12 form-group">
-      <mat-label>Field Name Backend</mat-label>
-      <input class="form-control" formControlName="fieldNameBackend" />
+      <mat-label
+        >Field Name Backend<span class="mandatory-icon"> *</span></mat-label
+      >
+      <input matInput class="form-control" formControlName="fieldNameBackend" />
       <mat-error
         *ngIf="
           f.fieldNameBackend &&
@@ -33,8 +41,10 @@
   </div>
   <div class="row">
     <div class="col-12 form-group">
-      <mat-label>Length of Field</mat-label>
-      <input class="form-control" formControlName="lengthOfField" />
+      <mat-label
+        >Length of Field<span class="mandatory-icon"> *</span></mat-label
+      >
+      <input matInput class="form-control" formControlName="lengthOfField" />
       <mat-error
         *ngIf="
           f.lengthOfField &&
@@ -49,8 +59,8 @@
   </div>
   <div class="row">
     <div class="col-12 form-group">
-      <mat-label>Type of Field</mat-label>
-      <input class="form-control" formControlName="typeOfField" />
+      <mat-label>Type of Field<span class="mandatory-icon"> *</span></mat-label>
+      <input matInput class="form-control" formControlName="typeOfField" />
       <mat-error
         *ngIf="
           f.typeOfField &&
@@ -65,13 +75,11 @@
   </div>
   <div class="row">
     <div class="col-12 form-group">
-      <mat-label>Validations for Field</mat-label>
-      <mat-form-field>
-        <mat-select
-          formControlName="validation"
-          [(ngModel)]="checkedOptions"
-          multiple
-        >
+      <mat-label
+        >Validations for Field<span class="mandatory-icon"> *</span></mat-label
+      >
+      <mat-form-field appearance="fill">
+        <mat-select formControlName="validation" multiple>
           <mat-option
             *ngFor="let validation of validations"
             [value]="validation.id"

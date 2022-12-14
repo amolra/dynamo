@@ -10,6 +10,9 @@
       font-size: rem(13px);
       color: #656a89;
       margin-bottom: rem(7px);
+      .mandatory-icon {
+        color: red;
+      }
     }
     mat-error {
       color: red;

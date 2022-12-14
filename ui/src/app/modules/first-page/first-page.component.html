@@ -3,7 +3,11 @@
     <form [formGroup]="customForm">
       <div class="row">
         <div class="col-12 form-group">
-          <mat-label>JavaScript Framework</mat-label>
+          <mat-label
+            >JavaScript Framework<span class="mandatory-icon">
+              *</span
+            ></mat-label
+          >
           <mat-form-field appearance="fill">
             <select
               matNativeControl
@@ -32,7 +36,9 @@
       </div>
       <div class="row">
         <div class="col-12 form-group">
-          <mat-label>Backend Framework</mat-label>
+          <mat-label
+            >Backend Framework<span class="mandatory-icon"> *</span></mat-label
+          >
           <mat-form-field appearance="fill">
             <select
               matNativeControl
@@ -62,8 +68,11 @@
       <div class="row">
         <div class="col-12">
           <div class="col-12 form-group">
-            <mat-label>Module Name</mat-label>
+            <mat-label
+              >Module Name<span class="mandatory-icon"> *</span></mat-label
+            >
             <input
+              matInput
               *ngIf="
                 moduleListForm.length === 1 ||
                 f.moduleName.value === 'Add New One'
@@ -103,8 +112,14 @@
       </div>
       <div class="row">
         <div class="col-12 form-group">
-          <mat-label>Component Name</mat-label>
-          <input class="form-control" formControlName="componentName" />
+          <mat-label
+            >Component Name<span class="mandatory-icon"> *</span></mat-label
+          >
+          <input
+            matInput
+            class="form-control"
+            formControlName="componentName"
+          />
           <mat-error
             *ngIf="
               f.componentName &&
@@ -119,7 +134,9 @@
       </div>
       <div class="row">
         <div class="col-12 form-group">
-          <mat-label>Component Type</mat-label>
+          <mat-label
+            >Component Type<span class="mandatory-icon"> *</span></mat-label
+          >
           <mat-form-field appearance="fill">
             <select
               matNativeControl
@@ -146,7 +163,7 @@
           </mat-error>
         </div>
       </div>
-      <div class="row">
+      <div class="row mt-3">
         <div formArrayName="customerAirCarrierCodes">
           <app-add-field-details
             *ngFor="let form of airCarrierArr; let i = index"
