@@ -123,7 +123,7 @@ function changeDir(dirName) {
     return subToReturn.asObservable();
 }
 exports.changeDir = changeDir;
-function createprojectStructure(parentModule, newModule, componentName) {
+function createprojectStructure(parentModule, newModule, componentName, fields, serviceMethodName) {
     const subToReturn = new rxjs_1.Subject();
     createFolders().subscribe((res) => {
         if (res) {

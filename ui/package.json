@@ -20,6 +20,8 @@
     "@angular/platform-browser": "~13.0.0",
     "@angular/platform-browser-dynamic": "~13.0.0",
     "@angular/router": "~13.0.0",
+    "@material/dialog": "^14.0.0",
+    "@material/menu": "^14.0.0",
     "bootstrap": "^5.2.3",
     "ng-multiselect-dropdown": "^0.3.9",
     "rxjs": "~7.4.0",

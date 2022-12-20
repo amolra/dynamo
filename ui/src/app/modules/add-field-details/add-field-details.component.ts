@@ -1,10 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { Component, Input } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { frontendValidations } from 'src/app/constants/constants';
 
 @Component({

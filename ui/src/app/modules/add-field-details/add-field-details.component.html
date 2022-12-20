@@ -1,72 +1,84 @@
 <div class="field-create-page" *ngIf="addFieldForm" [formGroup]="addFieldForm">
   <div class="row">
     <div class="col-12 form-group">
-      <mat-label>Field Name FET</mat-label>
-      <input class="form-control" formControlName="fieldNameFET" />
-      <mat-error
-        *ngIf="
-          f.fieldNameFET &&
-          f.fieldNameFET?.errors &&
-          f.fieldNameFET.errors?.required &&
-          (f.fieldNameFET.dirty || f.fieldNameFET.touched)
-        "
-      >
-        Field Name FET is Required
-      </mat-error>
+      <mat-form-field appearance="fill">
+        <mat-label>Field Name FET</mat-label>
+        <input matInput class="form-control" formControlName="fieldNameFET" />
+        <mat-error
+          *ngIf="
+            f.fieldNameFET &&
+            f.fieldNameFET?.errors &&
+            f.fieldNameFET.errors?.required &&
+            (f.fieldNameFET.dirty || f.fieldNameFET.touched)
+          "
+        >
+          Field Name FET is Required
+        </mat-error>
+      </mat-form-field>
     </div>
   </div>
   <div class="row">
     <div class="col-12 form-group">
-      <mat-label>Field Name Backend</mat-label>
-      <input class="form-control" formControlName="fieldNameBackend" />
-      <mat-error
-        *ngIf="
-          f.fieldNameBackend &&
-          f.fieldNameBackend?.errors &&
-          f.fieldNameBackend.errors?.required &&
-          (f.fieldNameBackend.dirty || f.fieldNameBackend.touched)
-        "
-      >
-        Field Name Backend is Required
-      </mat-error>
+      <mat-form-field appearance="fill">
+        <mat-label>Field Name Backend</mat-label>
+        <input
+          matInput
+          class="form-control"
+          formControlName="fieldNameBackend"
+        />
+        <mat-error
+          *ngIf="
+            f.fieldNameBackend &&
+            f.fieldNameBackend?.errors &&
+            f.fieldNameBackend.errors?.required &&
+            (f.fieldNameBackend.dirty || f.fieldNameBackend.touched)
+          "
+        >
+          Field Name Backend is Required
+        </mat-error>
+      </mat-form-field>
     </div>
   </div>
   <div class="row">
     <div class="col-12 form-group">
-      <mat-label>Length of Field</mat-label>
-      <input class="form-control" formControlName="lengthOfField" />
-      <mat-error
-        *ngIf="
-          f.lengthOfField &&
-          f.lengthOfField?.errors &&
-          f.lengthOfField.errors?.required &&
-          (f.lengthOfField.dirty || f.lengthOfField.touched)
-        "
-      >
-        Length of Field is Required
-      </mat-error>
+      <mat-form-field appearance="fill">
+        <mat-label>Length of Field</mat-label>
+        <input matInput class="form-control" formControlName="lengthOfField" />
+        <mat-error
+          *ngIf="
+            f.lengthOfField &&
+            f.lengthOfField?.errors &&
+            f.lengthOfField.errors?.required &&
+            (f.lengthOfField.dirty || f.lengthOfField.touched)
+          "
+        >
+          Length of Field is Required
+        </mat-error>
+      </mat-form-field>
     </div>
   </div>
   <div class="row">
     <div class="col-12 form-group">
-      <mat-label>Type of Field</mat-label>
-      <input class="form-control" formControlName="typeOfField" />
-      <mat-error
-        *ngIf="
-          f.typeOfField &&
-          f.typeOfField?.errors &&
-          f.typeOfField.errors?.required &&
-          (f.typeOfField.dirty || f.typeOfField.touched)
-        "
-      >
-        Type of Field is Required
-      </mat-error>
+      <mat-form-field appearance="fill">
+        <mat-label>Type of Field</mat-label>
+        <input matInput class="form-control" formControlName="typeOfField" />
+        <mat-error
+          *ngIf="
+            f.typeOfField &&
+            f.typeOfField?.errors &&
+            f.typeOfField.errors?.required &&
+            (f.typeOfField.dirty || f.typeOfField.touched)
+          "
+        >
+          Type of Field is Required
+        </mat-error>
+      </mat-form-field>
     </div>
   </div>
   <div class="row">
     <div class="col-12 form-group">
-      <mat-label>Validations for Field</mat-label>
-      <mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Validations for Field</mat-label>
         <mat-select
           formControlName="validation"
           [(ngModel)]="checkedOptions"
@@ -78,17 +90,18 @@
             >{{ validation.validationName }}</mat-option
           >
         </mat-select>
+
+        <mat-error
+          *ngIf="
+            f.validation &&
+            f.validation?.errors &&
+            f.validation.errors?.required &&
+            (f.validation.dirty || f.validation.touched)
+          "
+        >
+          Validation is Required
+        </mat-error>
       </mat-form-field>
-      <mat-error
-        *ngIf="
-          f.validation &&
-          f.validation?.errors &&
-          f.validation.errors?.required &&
-          (f.validation.dirty || f.validation.touched)
-        "
-      >
-        Validation is Required
-      </mat-error>
     </div>
   </div>
 </div>

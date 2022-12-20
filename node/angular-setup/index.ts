@@ -11,6 +11,7 @@ import {
   nodeDir,
   angularDirPathForDownload,
 } from '../constants';
+import { fields } from '../interfaces/fields';
 
 export function createFolders(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
@@ -149,7 +150,9 @@ export function changeDir(dirName: string): Observable<boolean> {
 export function createprojectStructure(
   parentModule: string,
   newModule: string,
-  componentName: string
+  componentName: string,
+  fields: fields[],
+  serviceMethodName: string
 ): Observable<boolean> {
   const subToReturn = new Subject<boolean>();
 
