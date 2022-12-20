@@ -13,21 +13,21 @@ export const backendFramework = [
 ];
 
 export const frontendValidations = [
-  { id: 1, validationName: 'required' },
-  { id: 2, validationName: 'email' },
-  { id: 3, validationName: 'maxLength' },
-  { id: 4, validationName: 'onlyNumberAllowed' },
-  { id: 5, validationName: 'spacesNotAllowed' },
-  { id: 6, validationName: 'maxLengthForDecimalNo' },
-  { id: 7, validationName: 'onlyPositiveNumbers' },
+  { id: 1, validationName: 'Required' },
+  { id: 2, validationName: 'Email' },
+  { id: 3, validationName: 'Max-Length' },
+  { id: 4, validationName: 'Only Number Allowed' },
+  { id: 5, validationName: 'Spaces Not Allowed' },
+  { id: 6, validationName: 'Max-Length For Decimal No' },
+  { id: 7, validationName: 'Only Positive Numbers' },
 ];
 
 export const componentTypes = [
-  { id: 1, type: 'ADD' },
-  { id: 2, type: 'EDIT' },
-  { id: 3, type: 'LIST' },
-  { id: 4, type: 'HOME' },
-  { id: 5, type: 'LOGIN' },
+  { id: 1, type: 'Add' },
+  { id: 2, type: 'Edit' },
+  { id: 3, type: 'List' },
+  { id: 4, type: 'Home' },
+  { id: 5, type: 'Login' },
 ];
 
 export interface IFieldDetails {
