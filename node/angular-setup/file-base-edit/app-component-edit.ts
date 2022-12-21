@@ -290,8 +290,8 @@ export function addModulesInAppModule(): Observable<boolean> {
     const text = data.join('\n');
     // Display the file content
     fs.writeFileSync(appModuleFile, text, 'utf-8');
-    subToReturn.next(true);
   }
+  subToReturn.next(true);
   console.log('write file complete');
   return subToReturn.asObservable();
 }

@@ -5,7 +5,11 @@ import {
   appModuleChanges,
 } from './angular-setup/file-base-edit/app-component-edit';
 import { loginStructure } from './angular-setup/file-base-edit/login-code-add';
-import { createprojectStructure } from './angular-setup/index';
+import {
+  createComponentService,
+  createModules,
+  createprojectStructure,
+} from './angular-setup/index';
 import { ApiSetting, packageEdit } from './node-setup';
 import { componentStructure } from './angular-setup/file-base-edit/add-fields-in-files';
 import { requestFields } from './interfaces/fields';
@@ -20,63 +24,81 @@ app.get('/', (req, res) => {
 });
 app.post('/project-setup', async (req, res) => {
   console.log('req.body', req.body);
+  await createprojectStructure().subscribe(async (result: boolean) => {
+    if (result) {
+      req.body.forEach(async (element: requestFields) => {
+        const {
+          parentModuleName,
+          newModuleName,
+          componentName,
+          fields,
+          serviceMethodName,
+        } = element;
+        await createModules(parentModuleName, newModuleName).subscribe(
+          (resultcreateModules: boolean) => {
+            if (resultcreateModules) {
+              createComponentService(
+                parentModuleName,
+                newModuleName,
+                componentName
+              ).subscribe(async (resultcreateComponentService: boolean) => {
+                if (resultcreateComponentService) {
+                  // subToReturn.next(true);
 
-  req.body.forEach(async (element: requestFields) => {
-    const {
-      parentModuleName,
-      newModuleName,
-      componentName,
-      fields,
-      serviceMethodName,
-    } = element;
-    await createprojectStructure(
-      parentModuleName,
-      newModuleName,
-      componentName,
-      fields,
-      serviceMethodName
-    ).subscribe(async (result: boolean) => {
-      console.log('result', result);
-      if (result) {
-        await addModulesInAppModule().subscribe(
-          async (resultAddModulesInAppModule: boolean) => {
-            console.log(
-              'resultAddModulesInAppModule',
-              resultAddModulesInAppModule
-            );
-            if (resultAddModulesInAppModule) {
-              console.log('reading app module');
-              await appModuleChanges().subscribe(
-                async (resultAppModuleChanges: boolean) => {
-                  console.log('resultAppModuleChanges', resultAppModuleChanges);
-                  if (resultAppModuleChanges) {
-                    console.log('Successfully inserted app module');
-                    await componentStructure(
-                      parentModuleName,
-                      newModuleName,
-                      componentName,
-                      fields,
-                      serviceMethodName
-                    ).subscribe((resultComponentStructure: boolean) => {
+                  console.log('result', result);
+
+                  await addModulesInAppModule().subscribe(
+                    async (resultAddModulesInAppModule: boolean) => {
                       console.log(
-                        'resultComponentStructure',
-                        resultComponentStructure
+                        'resultAddModulesInAppModule',
+                        resultAddModulesInAppModule
                       );
-                      if (resultAppModuleChanges) {
-                        console.log(
-                          'Successfully inserted resultComponentStructure'
+                      if (resultAddModulesInAppModule) {
+                        console.log('reading app module');
+                        await appModuleChanges().subscribe(
+                          async (resultAppModuleChanges: boolean) => {
+                            console.log(
+                              'resultAppModuleChanges',
+                              resultAppModuleChanges
+                            );
+                            if (resultAppModuleChanges) {
+                              console.log('Successfully inserted app module');
+                              await componentStructure(
+                                parentModuleName,
+                                newModuleName,
+                                componentName,
+                                fields,
+                                serviceMethodName
+                              ).subscribe(
+                                (resultComponentStructure: boolean) => {
+                                  console.log(
+                                    'resultComponentStructure',
+                                    resultComponentStructure
+                                  );
+                                  if (resultAppModuleChanges) {
+                                    console.log(
+                                      'Successfully inserted resultComponentStructure'
+                                    );
+                                  } else
+                                    res.send(
+                                      'resultComponentStructure API Failed'
+                                    );
+                                }
+                              );
+                            } else res.send('inserted app module API Failed');
+                          }
                         );
-                      } else res.send('resultComponentStructure API Failed');
-                    });
-                  } else res.send('inserted app module API Failed');
+                      } else res.send('reading app module API Failed');
+                    }
+                  );
                 }
-              );
-            } else res.send('reading app module API Failed');
+              });
+            }
           }
         );
-        res.send('Successfully installed');
-      } else res.send('installed API Failed');
-    });
+      });
+      res.send('Successfully installed');
+    } else res.send('installed API Failed');
   });
 });
 // app.get('/add-modules-in-app', async (req, res) => {

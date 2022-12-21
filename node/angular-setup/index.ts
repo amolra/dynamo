@@ -147,13 +147,7 @@ export function changeDir(dirName: string): Observable<boolean> {
   return subToReturn.asObservable();
 }
 
-export function createprojectStructure(
-  parentModule: string,
-  newModule: string,
-  componentName: string,
-  fields: fields[],
-  serviceMethodName: string
-): Observable<boolean> {
+export function createprojectStructure(): Observable<boolean> {
   const subToReturn = new Subject<boolean>();
 
   createFolders().subscribe((res: boolean) => {
@@ -162,21 +156,7 @@ export function createprojectStructure(
         if (result) {
           install().subscribe((resultInstall: boolean) => {
             if (resultInstall) {
-              createModules(parentModule, newModule).subscribe(
-                (resultcreateModules: boolean) => {
-                  if (resultcreateModules) {
-                    createComponentService(
-                      parentModule,
-                      newModule,
-                      componentName
-                    ).subscribe((resultcreateComponentService: boolean) => {
-                      if (resultcreateComponentService) {
-                        subToReturn.next(true);
-                      }
-                    });
-                  }
-                }
-              );
+              subToReturn.next(true);
             }
           });
         }

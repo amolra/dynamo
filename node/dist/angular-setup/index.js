@@ -123,7 +123,7 @@ function changeDir(dirName) {
     return subToReturn.asObservable();
 }
 exports.changeDir = changeDir;
-function createprojectStructure(parentModule, newModule, componentName, fields, serviceMethodName) {
+function createprojectStructure() {
     const subToReturn = new rxjs_1.Subject();
     createFolders().subscribe((res) => {
         if (res) {
@@ -131,15 +131,7 @@ function createprojectStructure(parentModule, newModule, componentName, fields, 
                 if (result) {
                     install().subscribe((resultInstall) => {
                         if (resultInstall) {
-                            createModules(parentModule, newModule).subscribe((resultcreateModules) => {
-                                if (resultcreateModules) {
-                                    createComponentService(parentModule, newModule, componentName).subscribe((resultcreateComponentService) => {
-                                        if (resultcreateComponentService) {
-                                            subToReturn.next(true);
-                                        }
-                                    });
-                                }
-                            });
+                            subToReturn.next(true);
                         }
                     });
                 }

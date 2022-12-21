@@ -28,40 +28,49 @@ app.get('/', (req, res) => {
 });
 app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('req.body', req.body);
-    req.body.forEach((element) => __awaiter(void 0, void 0, void 0, function* () {
-        const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, } = element;
-        yield (0, index_1.createprojectStructure)(parentModuleName, newModuleName, componentName, fields, serviceMethodName).subscribe((result) => __awaiter(void 0, void 0, void 0, function* () {
-            console.log('result', result);
-            if (result) {
-                yield (0, app_component_edit_1.addModulesInAppModule)().subscribe((resultAddModulesInAppModule) => __awaiter(void 0, void 0, void 0, function* () {
-                    console.log('resultAddModulesInAppModule', resultAddModulesInAppModule);
-                    if (resultAddModulesInAppModule) {
-                        console.log('reading app module');
-                        yield (0, app_component_edit_1.appModuleChanges)().subscribe((resultAppModuleChanges) => __awaiter(void 0, void 0, void 0, function* () {
-                            console.log('resultAppModuleChanges', resultAppModuleChanges);
-                            if (resultAppModuleChanges) {
-                                console.log('Successfully inserted app module');
-                                yield (0, add_fields_in_files_1.componentStructure)(parentModuleName, newModuleName, componentName, fields, serviceMethodName).subscribe((resultComponentStructure) => {
-                                    console.log('resultComponentStructure', resultComponentStructure);
-                                    if (resultAppModuleChanges) {
-                                        console.log('Successfully inserted resultComponentStructure');
+    yield (0, index_1.createprojectStructure)().subscribe((result) => __awaiter(void 0, void 0, void 0, function* () {
+        if (result) {
+            req.body.forEach((element) => __awaiter(void 0, void 0, void 0, function* () {
+                const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, } = element;
+                yield (0, index_1.createModules)(parentModuleName, newModuleName).subscribe((resultcreateModules) => {
+                    if (resultcreateModules) {
+                        (0, index_1.createComponentService)(parentModuleName, newModuleName, componentName).subscribe((resultcreateComponentService) => __awaiter(void 0, void 0, void 0, function* () {
+                            if (resultcreateComponentService) {
+                                // subToReturn.next(true);
+                                console.log('result', result);
+                                yield (0, app_component_edit_1.addModulesInAppModule)().subscribe((resultAddModulesInAppModule) => __awaiter(void 0, void 0, void 0, function* () {
+                                    console.log('resultAddModulesInAppModule', resultAddModulesInAppModule);
+                                    if (resultAddModulesInAppModule) {
+                                        console.log('reading app module');
+                                        yield (0, app_component_edit_1.appModuleChanges)().subscribe((resultAppModuleChanges) => __awaiter(void 0, void 0, void 0, function* () {
+                                            console.log('resultAppModuleChanges', resultAppModuleChanges);
+                                            if (resultAppModuleChanges) {
+                                                console.log('Successfully inserted app module');
+                                                yield (0, add_fields_in_files_1.componentStructure)(parentModuleName, newModuleName, componentName, fields, serviceMethodName).subscribe((resultComponentStructure) => {
+                                                    console.log('resultComponentStructure', resultComponentStructure);
+                                                    if (resultAppModuleChanges) {
+                                                        console.log('Successfully inserted resultComponentStructure');
+                                                    }
+                                                    else
+                                                        res.send('resultComponentStructure API Failed');
+                                                });
+                                            }
+                                            else
+                                                res.send('inserted app module API Failed');
+                                        }));
                                     }
                                     else
-                                        res.send('resultComponentStructure API Failed');
-                                });
+                                        res.send('reading app module API Failed');
+                                }));
                             }
-                            else
-                                res.send('inserted app module API Failed');
                         }));
                     }
-                    else
-                        res.send('reading app module API Failed');
-                }));
-                res.send('Successfully installed');
-            }
-            else
-                res.send('installed API Failed');
-        }));
+                });
+            }));
+            res.send('Successfully installed');
+        }
+        else
+            res.send('installed API Failed');
     }));
 }));
 // app.get('/add-modules-in-app', async (req, res) => {
