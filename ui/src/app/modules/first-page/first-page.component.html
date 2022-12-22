@@ -1,57 +1,26 @@
-<mat-form-field appearance="fill">
-  <mat-label>Toppings</mat-label>
-  <mat-select [formControl]="toppings" multiple>
-    <mat-option *ngFor="let topping of toppingList" [value]="topping">{{
-      topping
-    }}</mat-option>
-  </mat-select>
-</mat-form-field>
-
-<mat-form-field appearance="fill">
-  <mat-label>Toppings</mat-label>
-  <mat-select [formControl]="toppings" multiple>
-    <mat-option *ngFor="let topping of toppingList" [value]="topping">{{
-      topping
-    }}</mat-option>
-  </mat-select>
-</mat-form-field>
-
-<!-- <div class="create-page">
+<div class="create-page">
   <div class="form-wrapper">
     <form [formGroup]="customForm">
-      <mat-form-field appearance="fill">
-        <mat-label>Toppings</mat-label>
-        <mat-select [formControl]="toppings" multiple>
-          <mat-option *ngFor="let topping of toppingList" [value]="topping">{{
-            topping
-          }}</mat-option>
-        </mat-select>
-      </mat-form-field>
       <div class="row">
         <div class="col-12 form-group">
-<<<<<<< HEAD
-=======
           <mat-label
             >JavaScript Framework<span class="mandatory-icon">
               *</span
             ></mat-label
           >
->>>>>>> 942a90ae2758885219e0d5cc2c86c6358caefb16
           <mat-form-field appearance="fill">
-            <mat-label>JavaScript Framework</mat-label>
-
-            <mat-select
+            <select
               matNativeControl
               name="framework"
               formControlName="frontendFramework"
             >
-              <mat-option
+              <option
                 *ngFor="let framework of frontendFrameworkList"
                 [value]="framework.id"
               >
                 {{ framework.frameworkName }}
-              </mat-option>
-            </mat-select>
+              </option>
+            </select>
           </mat-form-field>
           <mat-error
             *ngIf="
@@ -67,27 +36,22 @@
       </div>
       <div class="row">
         <div class="col-12 form-group">
-<<<<<<< HEAD
-=======
           <mat-label
             >Backend Framework<span class="mandatory-icon"> *</span></mat-label
           >
->>>>>>> 942a90ae2758885219e0d5cc2c86c6358caefb16
           <mat-form-field appearance="fill">
-            <mat-label>Backend Framework</mat-label>
-
-            <mat-select
+            <select
               matNativeControl
               name="framework"
               formControlName="backendFramework"
             >
-              <mat-option
+              <option
                 *ngFor="let framework of backendFrameworkList"
                 [value]="framework.id"
               >
                 {{ framework.frameworkName }}
-              </mat-option>
-            </mat-select>
+              </option>
+            </select>
           </mat-form-field>
           <mat-error
             *ngIf="
@@ -104,18 +68,18 @@
       <div class="row">
         <div class="col-12">
           <div class="col-12 form-group">
-            <mat-form-field appearance="fill">
-              <mat-label>Module Name</mat-label>
-              <input
-                matInput
-                *ngIf="
-                  moduleListForm.length === 1 ||
-                  f.moduleName.value === 'Add New One'
-                "
-                class="form-control"
-                formControlName="moduleName"
-              />
-            </mat-form-field>
+            <mat-label
+              >Module Name<span class="mandatory-icon"> *</span></mat-label
+            >
+            <input
+              matInput
+              *ngIf="
+                moduleListForm.length === 1 ||
+                f.moduleName.value === 'Add New One'
+              "
+              class="form-control"
+              formControlName="moduleName"
+            />
             <mat-form-field
               appearance="fill"
               *ngIf="
@@ -123,18 +87,15 @@
                 f.moduleName.value !== 'Add New One'
               "
             >
-              <mat-select
+              <select
                 matNativeControl
                 name="framework"
                 formControlName="moduleName"
               >
-                <mat-option
-                  *ngFor="let module of moduleListForm"
-                  [value]="module"
-                >
+                <option *ngFor="let module of moduleListForm" [value]="module">
                   {{ module }}
-                </mat-option>
-              </mat-select>
+                </option>
+              </select>
             </mat-form-field>
             <mat-error
               *ngIf="
@@ -151,24 +112,24 @@
       </div>
       <div class="row">
         <div class="col-12 form-group">
-          <mat-form-field appearance="fill">
-            <mat-label>Component Name</mat-label>
-            <input
-              matInput
-              class="form-control"
-              formControlName="componentName"
-            />
-            <mat-error
-              *ngIf="
-                f.componentName &&
-                f.componentName?.errors &&
-                f.componentName.errors?.required &&
-                (f.componentName.dirty || f.componentName.touched)
-              "
-            >
-              Component Name is Required
-            </mat-error>
-          </mat-form-field>
+          <mat-label
+            >Component Name<span class="mandatory-icon"> *</span></mat-label
+          >
+          <input
+            matInput
+            class="form-control"
+            formControlName="componentName"
+          />
+          <mat-error
+            *ngIf="
+              f.componentName &&
+              f.componentName?.errors &&
+              f.componentName.errors?.required &&
+              (f.componentName.dirty || f.componentName.touched)
+            "
+          >
+            Component Name is Required
+          </mat-error>
         </div>
       </div>
       <div class="row">
@@ -177,20 +138,18 @@
             >Component Type<span class="mandatory-icon"> *</span></mat-label
           >
           <mat-form-field appearance="fill">
-            <mat-label>Component Type</mat-label>
-
-            <mat-select
+            <select
               matNativeControl
               name="componentType"
               formControlName="componentType"
             >
-              <mat-option
+              <option
                 *ngFor="let componentType of componentTypes"
                 [value]="componentType.id"
               >
                 {{ componentType.type }}
-              </mat-option>
-            </mat-select>
+              </option>
+            </select>
           </mat-form-field>
           <mat-error
             *ngIf="
@@ -236,4 +195,4 @@
       </div>
     </div>
   </div>
-</div> -->
+</div>
