@@ -9,6 +9,7 @@ import {
   dir,
   projectFolder,
 } from '../constants';
+import { fields } from '../interfaces/fields';
 export function changeDir(dirName: string): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
   console.log('change dir', basePath + baseDirName + '/' + dirName);
@@ -94,7 +95,11 @@ export function packageEdit(): Observable<boolean> {
   console.log('write file complete');
   return subToReturn.asObservable();
 }
-export function createIndexTs(): Observable<boolean> {
+export function createIndexTs(
+  componentName: string,
+  fields: fields[],
+  serviceMethodName: string
+): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
   const routingFile = 'index.ts';
   console.log(routingFile);
@@ -104,6 +109,14 @@ export function createIndexTs(): Observable<boolean> {
       console.log('Saved!');
     });
   }
+  let contentApi = ` app.post('/${serviceMethodName}', (req: Request, res: Response) => {
+    console.log('receiving data ...');
+    console.log('body is ',req.body);
+    if(req.body.userName==='asd' && req.body.password==='asd')
+    res.send({'result':true});
+    else
+    res.send({'result':false});
+  });`;
   const indexFileContent = `import express, { Express, Request, Response } from 'express';
   import cors from 'cors';
   const app: Express = express();
@@ -115,14 +128,7 @@ app.use(express.urlencoded({ extended: true }));
     res.send('Express + TypeScript Server');
   });
   app.use(cors()); // include before other routes
-  app.post('/login', (req: Request, res: Response) => {
-    console.log('receiving data ...');
-    console.log('body is ',req.body);
-    if(req.body.userName==='asd' && req.body.password==='asd')
-    res.send({'result':true});
-    else
-    res.send({'result':false});
-  });
+  ${contentApi}
   
   app.listen(port, () => {
     console.log(\`⚡️[server]: Server is running at https://localhost:\${port}\`);
@@ -152,7 +158,13 @@ export function runNodemon(): Observable<boolean> {
   );
   return subToReturn.asObservable();
 }
-export function ApiSetting(): Observable<boolean> {
+export function ApiSetting(
+  parentModuleName: string,
+  newModuleName: string,
+  componentName: string,
+  fields: fields[],
+  serviceMethodName: string
+): Observable<boolean> {
   const subToReturn = new Subject<boolean>();
   changeDir(nodeDir).subscribe((result: boolean) => {
     if (result) {
@@ -162,7 +174,11 @@ export function ApiSetting(): Observable<boolean> {
             if (resulttsEdit) {
               packageEdit().subscribe((resultPackageEdit: boolean) => {
                 if (resultPackageEdit) {
-                  createIndexTs().subscribe((resultcreateIndexTs: boolean) => {
+                  createIndexTs(
+                    componentName,
+                    fields,
+                    serviceMethodName
+                  ).subscribe((resultcreateIndexTs: boolean) => {
                     if (resultcreateIndexTs) {
                       runNodemon().subscribe(
                         (resultcreateRunNodemon: boolean) => {

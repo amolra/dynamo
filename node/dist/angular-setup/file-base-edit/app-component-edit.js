@@ -3,10 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.appModuleChanges = exports.addModulesInAppModule = exports.createMaterialModule = exports.createCustomValidator = exports.createLoginModule = exports.editAppRouting = exports.editAppHtml = void 0;
+exports.appModuleChanges = exports.addModulesInAppModule = exports.createMaterialModule = exports.createCustomValidator = exports.addModuleDependacies = exports.insertAppRouting = exports.editAppRouting = exports.editAppHtml = void 0;
 const constants_1 = require("../../constants");
 const fs_1 = __importDefault(require("fs"));
 const rxjs_1 = require("rxjs");
+const functions_1 = require("../common/functions");
 const directory = constants_1.angularDirPathForDownload + '/common';
 function editAppHtml() {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
@@ -22,35 +23,94 @@ function editAppRouting() {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
     const appRouteFile = constants_1.angularDirPathForDownload + '/app-routing.module.ts';
     console.log(appRouteFile);
-    fs_1.default.writeFileSync(appRouteFile, `import { NgModule } from '@angular/core';
+    if (fs_1.default.existsSync(appRouteFile)) {
+        const data = fs_1.default.readFileSync(appRouteFile).toString().split('\n');
+        if (data.findIndex((ele) => ele.includes('const routes:')) === -1) {
+            fs_1.default.writeFileSync(appRouteFile, `import { NgModule } from '@angular/core';
     import { RouterModule, Routes } from '@angular/router';
     
     const routes: Routes = [
-        { path: '', redirectTo: 'login', pathMatch: 'full' },
-        {
-          path: 'login',
-          loadChildren: () =>
-            import('./modules/login/login.module').then((m) => m.LoginModule),
-        },];;
+        ];
     
     @NgModule({
       imports: [RouterModule.forRoot(routes)],
       exports: [RouterModule],
     })
     export class AppRoutingModule {}`, 'utf-8');
+        }
+    }
     subToReturn.next(true);
     console.log('write file complete');
     return subToReturn.asObservable();
 }
 exports.editAppRouting = editAppRouting;
-function createLoginModule() {
+function insertAppRouting(parentModuleName, newModuleName) {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
-    const appRouteFile = constants_1.angularDirPathForDownload + '/modules/login/login.module.ts';
+    const appRouteFile = constants_1.angularDirPathForDownload + '/app-routing.module.ts';
+    const data = fs_1.default.readFileSync(appRouteFile).toString().split('\n');
+    console.log('data', data);
+    const moduleNameToInsert = 'const routes: Routes = [';
+    if (data.findIndex((ele) => ele.includes(moduleNameToInsert)) !== -1) {
+        const lastIndex = data
+            .reverse()
+            .findIndex((ele) => ele.includes(moduleNameToInsert));
+        const dataToInsert = parentModuleName === 'app'
+            ? `{
+        path: '${newModuleName}',
+        loadChildren: () =>
+          import('./modules/${newModuleName}/${newModuleName}.module').then((m) => m.${(0, functions_1.makeFirstCharUpperCase)(newModuleName)}Module),
+      },`
+            : `{
+        path: '${newModuleName}',
+        loadChildren: () =>
+          import('./modules/${parentModuleName}/${newModuleName}/${newModuleName}.module').then((m) => m.${(0, functions_1.makeFirstCharUpperCase)(newModuleName)}Module),
+      },`;
+        const braceIndex = data[lastIndex].indexOf('[') + 1;
+        data[lastIndex] =
+            data[lastIndex].slice(0, braceIndex) +
+                dataToInsert +
+                data[lastIndex].slice(braceIndex);
+        // data.splice(lastIndex, 0, dataToInsert);
+        data.reverse();
+        const text = data.join('\n');
+        console.log('text', text);
+        // Display the file content
+        fs_1.default.writeFileSync(appRouteFile, text, 'utf-8');
+        subToReturn.next(true);
+    }
+    console.log('write file complete');
+    return subToReturn.asObservable();
+}
+exports.insertAppRouting = insertAppRouting;
+function addModuleDependacies(parentModuleName, newModuleName, componentName) {
+    const subToReturn = new rxjs_1.BehaviorSubject(false);
+    const arrayModule = [
+        'RouterModule.forChild(routes),',
+        'CommonModule,',
+        'MaterialModule,',
+        'FormsModule,',
+        'ReactiveFormsModule,',
+        'HttpClientModule,',
+    ];
+    // const appRouteFile =
+    //   angularDirPathForDownload + '/modules/login/login.module.ts';
+    const appRouteFile = parentModuleName === 'app'
+        ? constants_1.angularDirPathForDownload +
+            '/modules/' +
+            newModuleName +
+            '/' +
+            newModuleName +
+            '.module.ts'
+        : constants_1.angularDirPathForDownload +
+            '/modules/' +
+            parentModuleName +
+            '/' +
+            newModuleName +
+            '/' +
+            newModuleName +
+            '.module.ts';
     console.log(appRouteFile);
-    let routingData = `import { NgModule } from '@angular/core';
-  import { CommonModule } from '@angular/common';
-  import { LoginComponent } from './login/login.component';
-  import { MaterialModule } from '../material/material.module';
+    (0, functions_1.insertModuleDependancies)(appRouteFile, 'MaterialModule', `import { MaterialModule } from '../material/material.module';
   import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   import { RouterModule, Routes } from '@angular/router';
   import {
@@ -61,21 +121,20 @@ function createLoginModule() {
   const routes: Routes = [
     {
       path: '',
-      component: LoginComponent,
+      component: ${(0, functions_1.makeFirstCharUpperCase)(componentName)}Component,
     },
-];
-  @NgModule({
-    declarations: [LoginComponent],
-    imports: [RouterModule.forChild(routes),CommonModule, MaterialModule, FormsModule, ReactiveFormsModule,HttpClientModule],
-    providers: [HttpClient]
-  })
-  export class LoginModule {}`;
-    fs_1.default.writeFileSync(appRouteFile, routingData, 'utf-8');
+];`).subscribe((response) => {
+        if (response) {
+            arrayModule.forEach((ele) => {
+                (0, functions_1.importModules)(appRouteFile, 'imports: [', ele);
+            });
+        }
+    });
     subToReturn.next(true);
     console.log('write routing file complete');
     return subToReturn.asObservable();
 }
-exports.createLoginModule = createLoginModule;
+exports.addModuleDependacies = addModuleDependacies;
 function createCustomValidator() {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
     const routingFile = directory + '/custom-validator.ts';
@@ -278,7 +337,7 @@ function addModulesInAppModule() {
     return subToReturn.asObservable();
 }
 exports.addModulesInAppModule = addModulesInAppModule;
-function appModuleChanges() {
+function appModuleChanges(parentModuleName, newModuleName, componentName) {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
     editAppHtml().subscribe((res) => {
         if (res) {
@@ -286,12 +345,16 @@ function appModuleChanges() {
                 if (materialOutPut) {
                     editAppRouting().subscribe((result) => {
                         if (result) {
-                            createLoginModule().subscribe((resultCreation) => {
-                                if (resultCreation) {
-                                    createCustomValidator().subscribe((resultCreateCustomValidator) => {
-                                        if (resultCreateCustomValidator) {
-                                            addModulesInAppModule().subscribe((resultAddModulesInAppModule) => {
-                                                subToReturn.next(true);
+                            insertAppRouting(parentModuleName, newModuleName).subscribe((re) => {
+                                if (re) {
+                                    addModuleDependacies(parentModuleName, newModuleName, componentName).subscribe((resultCreation) => {
+                                        if (resultCreation) {
+                                            createCustomValidator().subscribe((resultCreateCustomValidator) => {
+                                                if (resultCreateCustomValidator) {
+                                                    addModulesInAppModule().subscribe((resultAddModulesInAppModule) => {
+                                                        subToReturn.next(true);
+                                                    });
+                                                }
                                             });
                                         }
                                     });
