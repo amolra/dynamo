@@ -18,6 +18,9 @@ const app_component_edit_1 = require("./angular-setup/file-base-edit/app-compone
 const index_1 = require("./angular-setup/index");
 const node_setup_1 = require("./node-setup");
 const add_fields_in_files_1 = require("./angular-setup/file-base-edit/add-fields-in-files");
+const http_1 = __importDefault(require("http"));
+const db_table_generation_1 = require("./node-setup/database/db-table-generation");
+const querystring = require('querystring');
 const app = (0, express_1.default)();
 const port = 3000;
 app.use((0, cors_1.default)()); // include before other routes
@@ -42,14 +45,48 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
                                     console.log('resultAddModulesInAppModule', resultAddModulesInAppModule);
                                     if (resultAddModulesInAppModule) {
                                         console.log('reading app module');
-                                        yield (0, app_component_edit_1.appModuleChanges)().subscribe((resultAppModuleChanges) => __awaiter(void 0, void 0, void 0, function* () {
+                                        yield (0, app_component_edit_1.appModuleChanges)(parentModuleName, newModuleName, componentName).subscribe((resultAppModuleChanges) => __awaiter(void 0, void 0, void 0, function* () {
                                             console.log('resultAppModuleChanges', resultAppModuleChanges);
                                             if (resultAppModuleChanges) {
                                                 console.log('Successfully inserted app module');
                                                 yield (0, add_fields_in_files_1.componentStructure)(parentModuleName, newModuleName, componentName, fields, serviceMethodName).subscribe((resultComponentStructure) => {
                                                     console.log('resultComponentStructure', resultComponentStructure);
-                                                    if (resultAppModuleChanges) {
+                                                    if (resultComponentStructure) {
                                                         console.log('Successfully inserted resultComponentStructure');
+                                                        // let post_data = querystring.stringify({
+                                                        //   parentModuleName,
+                                                        //   newModuleName,
+                                                        //   componentName,
+                                                        //   fields,
+                                                        //   serviceMethodName,
+                                                        // });
+                                                        // let request = await http.request(
+                                                        //   {
+                                                        //     host: 'localhost',
+                                                        //     port: 3000,
+                                                        //     path: '/login-api-code-add',
+                                                        //     method: 'POST',
+                                                        //     headers: {
+                                                        //       'Content-Type':
+                                                        //         'application/x-www-form-urlencoded',
+                                                        //       'Content-Length':
+                                                        //         Buffer.byteLength(post_data),
+                                                        //       // headers such as "Cookie" can be extracted from req object and sent to /test
+                                                        //     },
+                                                        //   },
+                                                        //   function (response) {
+                                                        //     var data = 'amol="rajhans"';
+                                                        //     response.setEncoding('utf8');
+                                                        //     response.on('data', (chunk) => {
+                                                        //       data += chunk;
+                                                        //     });
+                                                        //     response.on('end', () => {
+                                                        //       res.end('check result: ' + data);
+                                                        //     });
+                                                        //   }
+                                                        // );
+                                                        // request.write(post_data);
+                                                        // request.end();
                                                     }
                                                     else
                                                         res.send('resultComponentStructure API Failed');
@@ -94,14 +131,110 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
 //     else res.send('API Failed');
 //   });
 // });
-app.get('/login-api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, node_setup_1.ApiSetting)().subscribe((result) => {
+app.post('/login-api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('req.body', req.body);
+    const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, } = req.body;
+    yield (0, node_setup_1.ApiSetting)(parentModuleName, newModuleName, componentName, fields, serviceMethodName).subscribe((result) => {
         console.log('result', result);
         if (result)
             res.send('Successfully created api');
         else
             res.send('API Failed');
     });
+}));
+app.get('/mysql-connect-api', (req, res) => {
+    // dabataseManipulation().then((response: Observable<boolean>) => {
+    //   response.subscribe((resp: boolean) => {
+    //     if (resp) res.send('Successfully connected mysql');
+    //   });
+    // });
+    const fields = [
+        {
+            fieldName: 'userName',
+            fieldLabel: 'User Name',
+            fieldNameBackend: 'userName',
+            lengthOfField: '100',
+            typeOfField: 'text',
+            validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
+        },
+        {
+            fieldName: 'password',
+            fieldLabel: 'password',
+            fieldNameBackend: 'password',
+            lengthOfField: '100',
+            typeOfField: 'password',
+            validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
+        },
+        {
+            fieldName: 'confirmPassword',
+            fieldLabel: 'Confirm Password',
+            fieldNameBackend: 'confirmPassword',
+            lengthOfField: '100',
+            typeOfField: 'password',
+            validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
+        },
+        {
+            fieldName: 'firstName',
+            fieldLabel: 'First Name',
+            fieldNameBackend: 'firstName',
+            lengthOfField: '100',
+            typeOfField: 'text',
+            validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
+        },
+    ];
+    (0, db_table_generation_1.dbOprations)('dynamo', 'register', fields).subscribe((response) => {
+        if (response)
+            res.send('Successdully connected to db');
+    });
+    // res.send('Loading ....');
+});
+app.get('/login-api', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let post_data = querystring.stringify({
+        parentModuleName: 'app',
+        newModuleName: 'login',
+        componentName: 'login',
+        serviceMethodName: 'login',
+        fields: [
+            {
+                fieldName: 'userName',
+                fieldLabel: 'User Name',
+                fieldNameBackend: 'userName',
+                lengthOfField: '100',
+                typeOfField: 'text',
+                validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
+            },
+            {
+                fieldName: 'password',
+                fieldLabel: 'password',
+                fieldNameBackend: 'password',
+                lengthOfField: '100',
+                typeOfField: 'password',
+                validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
+            },
+        ],
+    });
+    let request = yield http_1.default.request({
+        host: 'localhost',
+        port: 3000,
+        path: '/login-api-code-add',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(post_data),
+            // headers such as "Cookie" can be extracted from req object and sent to /test
+        },
+    }, function (response) {
+        var data = '';
+        response.setEncoding('utf8');
+        response.on('data', (chunk) => {
+            data += chunk;
+        });
+        response.on('end', () => {
+            res.end('check result: ' + data);
+        });
+    });
+    request.write(post_data);
+    request.end();
 }));
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

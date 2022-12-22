@@ -1,6 +1,63 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import fs from 'fs';
 import { fields } from '../../interfaces/fields';
+export function insertModuleDependancies(
+  appModuleFile: string,
+  moduleNameToInsert: string,
+  dataToInsert: string
+): Observable<boolean> {
+  const subToReturn = new BehaviorSubject<boolean>(false);
+  const data = fs.readFileSync(appModuleFile).toString().split('\n');
+  //   const moduleNameToInsert = dataToInsert;
+  if (data.findIndex((ele) => ele.includes(moduleNameToInsert)) === -1) {
+    const lastIndex = data
+      .reverse()
+      .findIndex((ele) => ele.includes('import {'));
+    const lastModuleName = data[lastIndex].substr(
+      data[lastIndex].indexOf('{') + 1,
+      data[lastIndex].indexOf('}') - data[lastIndex].indexOf('{') - 1
+    );
+    console.log('lastModuleName', lastModuleName);
+    data.splice(lastIndex, 0, dataToInsert);
+
+    data.reverse();
+    const text = data.join('\n');
+    // Display the file content
+    fs.writeFileSync(appModuleFile, text, 'utf-8');
+    subToReturn.next(true);
+  }
+  return subToReturn.asObservable();
+}
+export function importModules(
+  appModuleFile: string,
+  moduleNameToInsert: string,
+  dataToInsert: string
+): Observable<boolean> {
+  const subToReturn = new BehaviorSubject<boolean>(false);
+  const data = fs.readFileSync(appModuleFile).toString().split('\n');
+  console.log('data', data);
+  //   const moduleNameToInsert = dataToInsert;
+  if (data.findIndex((ele) => ele.includes(moduleNameToInsert)) !== -1) {
+    const lastIndex = data
+      .reverse()
+      .findIndex((ele) => ele.includes(moduleNameToInsert));
+    const braceIndex = data[lastIndex].indexOf('[') + 1;
+    data[lastIndex] =
+      data[lastIndex].slice(0, braceIndex) +
+      dataToInsert +
+      data[lastIndex].slice(braceIndex);
+
+    // data.splice(lastIndex, 0, dataToInsert);
+
+    data.reverse();
+    const text = data.join('\n');
+    console.log('text', text);
+    // Display the file content
+    fs.writeFileSync(appModuleFile, text, 'utf-8');
+    subToReturn.next(true);
+  }
+  return subToReturn.asObservable();
+}
 export function insertServiceDependacies(
   appModuleFile: string
 ): Observable<boolean> {
