@@ -1,4 +1,8 @@
-import { NgModule } from '@angular/core';
+import {
+  CUSTOM_ELEMENTS_SCHEMA,
+  NgModule,
+  NO_ERRORS_SCHEMA,
+} from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -23,12 +27,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
 import { ModuleComponentListComponent } from './modules/module-component-list/module-component-list.component';
+import { FormComponent } from './modules/form/form.component';
 @NgModule({
   declarations: [
     AppComponent,
     FirstPageComponent,
     AddFieldDetailsComponent,
     ModuleComponentListComponent,
+    FormComponent,
   ],
   imports: [
     BrowserModule,
@@ -51,8 +57,10 @@ import { ModuleComponentListComponent } from './modules/module-component-list/mo
     MatSelectModule,
     MatChipsModule,
     MatRippleModule,
+    MatSelectModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
 })
 export class AppModule {}

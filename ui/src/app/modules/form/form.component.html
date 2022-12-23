@@ -1,0 +1,155 @@
+<div class="form-container">
+  <form [formGroup]="formName">
+    <div class="tech-block">
+      <div class="row">
+        <div class="col-4">
+          <mat-form-field appearance="fill">
+            <mat-label>UI Technology</mat-label>
+            <mat-select formControlName="fetTech">
+              <mat-option *ngFor="let tech of fetTechnology" [value]="tech.id">
+                {{ tech.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-8">
+          <mat-form-field appearance="fill">
+            <mat-label>Backend Technology</mat-label>
+            <mat-select formControlName="backendTech">
+              <mat-option
+                *ngFor="let tech of backendTechnology"
+                [value]="tech.id"
+              >
+                {{ tech.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+    <div class="module-block">
+      <div class="row">
+        <div class="col-8">
+          <mat-form-field>
+            <mat-label>Module Name</mat-label>
+            <input type="name" matInput formControlName="newModuleName" />
+          </mat-form-field>
+        </div>
+        <div class="col-2">
+          <button
+            mat-raised-button
+            color="primary"
+            class="float-right"
+            (click)="ComponentfieldForm()"
+          >
+            Save
+          </button>
+        </div>
+        <div class="col-2">
+          <button mat-raised-button color="primary" class="float-right">
+            Add More Module
+          </button>
+        </div>
+      </div>
+    </div>
+    <div formArrayName="component">
+      <div
+        class="component-block"
+        *ngFor="let component of component; let i = index"
+      >
+        <div class="row" [formGroupName]="i">
+          <div class="col-4">
+            <mat-form-field>
+              <mat-label>Component Name</mat-label>
+              <input type="name" matInput formControlName="name" />
+            </mat-form-field>
+          </div>
+          <div class="col-4">
+            <mat-form-field appearance="fill">
+              <mat-label>Component Type</mat-label>
+              <mat-select formControlName="type">
+                <mat-option *ngFor="let type of type" [value]="type.id">
+                  {{ type.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <button
+              mat-raised-button
+              color="primary"
+              class="float-right"
+              (click)="fieldForm(i)"
+            >
+              Save
+            </button>
+          </div>
+          <div class="col-2">
+            <button mat-raised-button color="primary" class="float-right">
+              Add More Component
+            </button>
+          </div>
+          <div formArrayName="fields">
+            <div
+              class="sub-form"
+              *ngFor="let fields of field(i).controls; let fieldIndex = index"
+            >
+              <div class="row" [formGroupName]="fieldIndex">
+                <div class="col-4">
+                  <mat-form-field>
+                    <mat-label>Field Name (Frontend)</mat-label>
+                    <input type="name" matInput formControlName="fieldName" />
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field>
+                    <mat-label>Field Name (Backend)</mat-label>
+                    <input type="name" matInput formControlName="fiellabel" />
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field>
+                    <mat-label>Length of Field</mat-label>
+                    <input type="name" matInput formControlName="fieldlength" />
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-4">
+                  <mat-form-field>
+                    <mat-label>Type of Field</mat-label>
+                    <input type="name" matInput formControlName="typeofField" />
+                  </mat-form-field>
+                </div>
+                <div class="col-4">
+                  <mat-form-field appearance="fill">
+                    <mat-label>Field Validation</mat-label>
+                    <mat-select multiple>
+                      <mat-option
+                        *ngFor="let validation of validation"
+                        [value]="validation.name"
+                        formControlName="validation"
+                      >
+                        {{ validation.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-2">
+                  <button mat-raised-button color="primary" class="float-right">
+                    Save
+                  </button>
+                </div>
+                <div class="col-2">
+                  <button mat-raised-button color="primary">
+                    Add More Fields
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
