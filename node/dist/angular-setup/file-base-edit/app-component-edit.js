@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.appModuleChanges = exports.addModulesInAppModule = exports.createMaterialModule = exports.createCustomValidator = exports.addModuleDependacies = exports.insertAppRouting = exports.editAppRouting = exports.editAppHtml = void 0;
+exports.appModuleChanges = exports.addModulesInAppModule = exports.createMaterialModule = exports.createCustomValidator = exports.addModuleDependacies = exports.insertAppRouting = exports.editAppRouting = exports.editCss = exports.editAppHtml = void 0;
 const constants_1 = require("../../constants");
 const fs_1 = __importDefault(require("fs"));
 const rxjs_1 = require("rxjs");
@@ -19,6 +19,19 @@ function editAppHtml() {
     return subToReturn.asObservable();
 }
 exports.editAppHtml = editAppHtml;
+function editCss() {
+    const subToReturn = new rxjs_1.BehaviorSubject(false);
+    const appHtmlFile = constants_1.srcFile + '/styles.css';
+    console.log(appHtmlFile);
+    fs_1.default.writeFileSync(appHtmlFile, `body {
+    text-align:center;
+    margin: auto;
+  }`, 'utf-8');
+    subToReturn.next(true);
+    console.log('write file complete');
+    return subToReturn.asObservable();
+}
+exports.editCss = editCss;
 function editAppRouting() {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
     const appRouteFile = constants_1.angularDirPathForDownload + '/app-routing.module.ts';
@@ -341,18 +354,22 @@ function appModuleChanges(parentModuleName, newModuleName, componentName) {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
     editAppHtml().subscribe((res) => {
         if (res) {
-            createMaterialModule().subscribe((materialOutPut) => {
-                if (materialOutPut) {
-                    editAppRouting().subscribe((result) => {
-                        if (result) {
-                            insertAppRouting(parentModuleName, newModuleName).subscribe((re) => {
-                                if (re) {
-                                    addModuleDependacies(parentModuleName, newModuleName, componentName).subscribe((resultCreation) => {
-                                        if (resultCreation) {
-                                            createCustomValidator().subscribe((resultCreateCustomValidator) => {
-                                                if (resultCreateCustomValidator) {
-                                                    addModulesInAppModule().subscribe((resultAddModulesInAppModule) => {
-                                                        subToReturn.next(true);
+            editCss().subscribe((resp) => {
+                if (resp) {
+                    createMaterialModule().subscribe((materialOutPut) => {
+                        if (materialOutPut) {
+                            editAppRouting().subscribe((result) => {
+                                if (result) {
+                                    insertAppRouting(parentModuleName, newModuleName).subscribe((re) => {
+                                        if (re) {
+                                            addModuleDependacies(parentModuleName, newModuleName, componentName).subscribe((resultCreation) => {
+                                                if (resultCreation) {
+                                                    createCustomValidator().subscribe((resultCreateCustomValidator) => {
+                                                        if (resultCreateCustomValidator) {
+                                                            addModulesInAppModule().subscribe((resultAddModulesInAppModule) => {
+                                                                subToReturn.next(true);
+                                                            });
+                                                        }
                                                     });
                                                 }
                                             });

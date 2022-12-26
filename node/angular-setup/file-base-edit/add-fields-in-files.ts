@@ -86,6 +86,63 @@ export function fieldHtml(
   console.log('write file complete');
   return subToReturn.asObservable();
 }
+export function fieldCss(
+  parentModule: string,
+  newModule: string,
+  componentName: string,
+  fields: fields[]
+): Observable<boolean> {
+  const subToReturn = new BehaviorSubject<boolean>(false);
+  const appHtmlFile =
+    parentModule === 'app'
+      ? angularDirPathForDownload +
+        '/modules/' +
+        newModule +
+        '/' +
+        componentName +
+        '/' +
+        componentName +
+        '.component.css'
+      : angularDirPathForDownload +
+        '/modules/' +
+        parentModule +
+        '/' +
+        newModule +
+        '/' +
+        componentName +
+        '/' +
+        componentName +
+        '.component.css';
+  console.log(appHtmlFile);
+
+  fs.writeFileSync(
+    appHtmlFile,
+    `div {
+      width:20%;
+      margin:auto;
+          
+    }
+    form {
+        width:50%;
+        margin:auto;
+      }
+      .mat-mdc-form-field {
+        padding: 15px;
+          
+      }
+      ::ng-deep .mat-mdc-form-field-infix {
+        padding-top: 15px;
+      }
+      mat-error {
+        color:red;
+      }`,
+    'utf-8'
+  );
+  subToReturn.next(true);
+  console.log('write file complete');
+  return subToReturn.asObservable();
+}
+
 export function fieldComponentCode(
   parentModule: string,
   newModule: string,
@@ -207,22 +264,30 @@ export function componentStructure(
   fieldHtml(parentModule, newModule, componentName, fields).subscribe(
     (res: boolean) => {
       if (res) {
-        fieldComponentCode(
-          parentModule,
-          newModule,
-          componentName,
-          fields
-        ).subscribe((result: boolean) => {
-          if (result) {
-            loginService(parentModule, newModule, serviceMethodName).subscribe(
-              (resultInstall: boolean) => {
-                if (resultInstall) {
-                  subToReturn.next(true);
+        fieldCss(parentModule, newModule, componentName, fields).subscribe(
+          (resp: boolean) => {
+            if (resp) {
+              fieldComponentCode(
+                parentModule,
+                newModule,
+                componentName,
+                fields
+              ).subscribe((result: boolean) => {
+                if (result) {
+                  loginService(
+                    parentModule,
+                    newModule,
+                    serviceMethodName
+                  ).subscribe((resultInstall: boolean) => {
+                    if (resultInstall) {
+                      subToReturn.next(true);
+                    }
+                  });
                 }
-              }
-            );
+              });
+            }
           }
-        });
+        );
       }
     }
   );
