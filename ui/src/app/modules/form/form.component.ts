@@ -1,18 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-} from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.scss'],
 })
-export class FormComponent implements OnInit {
+export class FormComponent {
   fetTechnology = [
     { id: 1, name: 'Angular' },
     { id: 2, name: 'React' },
@@ -24,57 +18,66 @@ export class FormComponent implements OnInit {
     { id: 3, name: 'PHP' },
     { id: 4, name: 'Python' },
   ];
-  type = [
+  types = [
     { id: 1, name: 'Add' },
     { id: 2, name: 'Edit' },
     { id: 3, name: 'Home' },
   ];
-  validation = [
+  validations = [
     { id: 1, name: 'Required' },
     { id: 2, name: 'SpacesNotAllowed' },
     { id: 3, name: 'MaxLength(100)' },
     { id: 4, name: 'Unique' },
     { id: 5, name: 'Email' },
   ];
-  public formName: FormGroup;
-  constructor(public fb: FormBuilder) {
-    this.formName = this.fb.group({
-      fetTech: new FormControl(''),
-      backendTech: new FormControl(''),
-      parentModuleName: new FormControl(''),
-      newModuleName: new FormControl(''),
-      component: new FormArray([]),
+  codeForm: FormGroup;
+  constructor(private fb: FormBuilder) {
+    this.codeForm = this.fb.group({
+      fetTech: '',
+      backTech: '',
+      component: this.fb.array([]),
     });
   }
-  public ComponentfieldForm(): void {
-    const controls = this.fb.group({
-      name: new FormControl(''),
-      type: new FormControl(''),
-      fields: new FormArray([]),
+  component(): FormArray {
+    return this.codeForm.get('component') as FormArray;
+  }
+  newComponent(): FormGroup {
+    return this.fb.group({
+      newModuleName: '',
+      componentName: '',
+      serviceMethodName: '',
+      typeOfOpration: '',
+      tableName: '',
+      tableNameForTransaction: '',
+      fields: this.fb.array([]),
     });
-    (<FormArray>this.formName.get('component')).push(controls);
   }
-  get component() {
-    return (this.formName.get('component') as FormArray).controls;
+  addComponent() {
+    this.component().push(this.newComponent());
   }
-  public fieldForm(i: number): void {
-    const controls = this.fb.group({
-      fieldName: new FormControl(''),
-      fieldLabel: new FormControl(''),
-      fieldNameBackend: new FormControl(''),
-      lengthOfField: new FormControl(''),
-      typeOfField: new FormControl(''),
-      validation: new FormControl([]),
+  removeComponent(i: number) {
+    this.component().removeAt(i);
+  }
+  getField(i: number): FormArray {
+    return this.component().at(i).get('fields') as FormArray;
+  }
+  newField(): FormGroup {
+    return this.fb.group({
+      fieldName: '',
+      fieldLabel: '',
+      fieldNameBackend: '',
+      lengthOfField: '',
+      typeOfField: '',
+      validation: [],
     });
-    const component = (<FormArray>this.formName.get('component'))
-      ?.at(i)
-      .get('fields') as FormArray;
-    component.push(controls);
   }
-  public field(i: number): FormArray {
-    return (<FormArray>this.formName.get('component'))?.controls[
-      i
-    ] as FormArray;
+  addField(i: number) {
+    this.getField(i).push(this.newField());
   }
-  ngOnInit(): void {}
+  removeComponentField(component: number, field: number) {
+    this.getField(component).removeAt(field);
+  }
+  save(): void {
+    console.log(this.codeForm.value);
+  }
 }

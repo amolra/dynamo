@@ -1,31 +1,17 @@
 .form-container{
-    padding-top: 50px;
-    width: 60%;
+    border: 1px solid lightgray;
+    padding: 10px;
+    width: 1000px;
     margin: auto;
-    margin-top: 100px;
-    .tech-block{
-        border: 1px solid grey;
-        padding: 30px;
-        background-color: #e5e9f3;
-        margin-top: 50px;
+    .component-container{
+        border: 1px solid lightgray;
+        padding: 10px;
+        margin: 10px;
     }
-    .sub-form{
-        border: 1px solid grey;
-        margin-top: 50px;
-        padding: 30px;
-        background-color: #e5e9f3;
-        
+    .row{
+        .float-right{
+            text-align: right;
+        }
     }
-    .component-block{
-        border: 1px solid grey;
-        margin-top: 50px;
-        padding: 30px;
-        background-color: #e5e9f3;
-    }
-    .module-block{
-        border: 1px solid grey;
-        margin-top: 50px;
-        padding: 30px;
-        background-color: #e5e9f3;
-    }
+
 }

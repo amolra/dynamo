@@ -57,7 +57,6 @@ import { FormComponent } from './modules/form/form.component';
     MatSelectModule,
     MatChipsModule,
     MatRippleModule,
-    MatSelectModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
