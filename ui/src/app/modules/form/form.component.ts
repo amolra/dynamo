@@ -43,6 +43,7 @@ export class FormComponent {
   }
   newComponent(): FormGroup {
     return this.fb.group({
+      parentModuleName: '',
       newModuleName: '',
       componentName: '',
       serviceMethodName: '',
