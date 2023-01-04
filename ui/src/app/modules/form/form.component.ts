@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormService } from '../form.service';
 
 @Component({
   selector: 'app-form',
@@ -31,7 +32,7 @@ export class FormComponent {
     { id: 5, name: 'Email' },
   ];
   codeForm: FormGroup;
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, public service: FormService) {
     this.codeForm = this.fb.group({
       fetTech: '',
       backTech: '',
@@ -80,5 +81,12 @@ export class FormComponent {
   }
   save(): void {
     console.log(this.codeForm.value);
+    this.service
+      .generateModuleComponent(this.codeForm.value.component)
+      .subscribe((result) => {
+        if (result) {
+          alert('Code generated');
+        }
+      });
   }
 }

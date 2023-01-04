@@ -25,6 +25,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
 import { FormComponent } from './modules/form/form.component';
+import { HttpClientModule } from '@angular/common/http';
 @NgModule({
   declarations: [AppComponent, FormComponent],
   imports: [
@@ -48,6 +49,7 @@ import { FormComponent } from './modules/form/form.component';
     MatSelectModule,
     MatChipsModule,
     MatRippleModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

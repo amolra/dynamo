@@ -58,7 +58,7 @@
           <div class="col-3">
             <mat-form-field>
               <mat-label>Type Of Opration</mat-label>
-              <mat-select multiple formControlName="typeOfOpration">
+              <mat-select formControlName="typeOfOpration">
                 <mat-option *ngFor="let type of types" [value]="type.name">
                   {{ type.name }}
                 </mat-option>
