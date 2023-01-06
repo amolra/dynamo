@@ -4,7 +4,7 @@
       <mat-form-field>
         <mat-label>Frontend Technology</mat-label>
         <mat-select formControlName="fetTech">
-          <mat-option *ngFor="let tech of fetTechnology" [value]="tech.id">
+          <mat-option *ngFor="let tech of fetTechnology" [value]="tech.name">
             {{ tech.name }}
           </mat-option>
         </mat-select>
@@ -14,7 +14,10 @@
       <mat-form-field>
         <mat-label>Backend Technology</mat-label>
         <mat-select formControlName="backTech">
-          <mat-option *ngFor="let tech of backendTechnology" [value]="tech.id">
+          <mat-option
+            *ngFor="let tech of backendTechnology"
+            [value]="tech.name"
+          >
             {{ tech.name }}
           </mat-option>
         </mat-select>

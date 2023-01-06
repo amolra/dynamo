@@ -7,11 +7,18 @@ import { IModule } from '../interface/form';
   providedIn: 'root',
 })
 export class FormService {
+  apiURL = 'http://localhost:3000/';
   constructor(private httpClient: HttpClient) {}
 
   public generateModuleComponent(moduleObj: IModule[]): Observable<IModule[]> {
     return this.httpClient.post<IModule[]>(
-      'http://localhost:3000/project-setup',
+      this.apiURL + 'project-setup',
+      moduleObj
+    );
+  }
+  public generateAPICode(moduleObj: IModule[]): Observable<IModule[]> {
+    return this.httpClient.post<IModule[]>(
+      this.apiURL + 'login-api',
       moduleObj
     );
   }

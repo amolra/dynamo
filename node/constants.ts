@@ -1,4 +1,4 @@
-export const basePath = 'd:/dynamo_code/dynamo/';
+export const basePath = 'd:/dynamo-project/dynamo/';
 export const projectFolder = 'node';
 export const baseDirName = 'codes';
 export const dir = '../' + baseDirName;

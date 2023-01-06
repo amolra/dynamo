@@ -53,6 +53,7 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
                                                     console.log('resultComponentStructure', resultComponentStructure);
                                                     if (resultComponentStructure) {
                                                         console.log('Successfully inserted resultComponentStructure');
+                                                        res.send(JSON.stringify({ result: true }));
                                                         // let post_data = querystring.stringify({
                                                         //   parentModuleName,
                                                         //   newModuleName,
@@ -104,7 +105,6 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
                     }
                 });
             }));
-            res.send('Successfully installed');
         }
         else
             res.send('installed API Failed');
@@ -141,10 +141,14 @@ app.post('/login-api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, 
                 const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, tableNameForTransaction, typeOfOpration, } = element;
                 (0, node_setup_1.createIndexTs)(componentName, fields, serviceMethodName, typeOfOpration, tableNameForTransaction).subscribe((resultcreateIndexTs) => {
                     if (resultcreateIndexTs) {
+                        (0, db_table_generation_1.dbOprations)('dynamo', tableNameForTransaction, fields).subscribe((response) => {
+                            if (response) {
+                                res.send(JSON.stringify({ result: true }));
+                            }
+                        });
                     }
                 });
             }));
-            res.send('Successfully created api');
         }
         else
             res.send('API Failed');

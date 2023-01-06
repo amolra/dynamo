@@ -216,7 +216,7 @@ export function createIndexTs(
   }
 
   let contentApi = ``;
-  if (typeOfOpration === 'list') {
+  if (typeOfOpration === 'List') {
     contentApi = ` app.post('/${serviceMethodName}', (req: Request, res: Response) => {
       console.log('receiving data ...');
       console.log('body is ',req.body);

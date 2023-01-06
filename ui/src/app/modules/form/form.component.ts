@@ -14,6 +14,7 @@ export class FormComponent {
     { id: 3, name: 'ViewJs' },
   ];
   backendTechnology = [
+    { id: 0, name: 'NodeJs' },
     { id: 1, name: '.Net' },
     { id: 2, name: 'Java' },
     { id: 3, name: 'PHP' },
@@ -21,8 +22,8 @@ export class FormComponent {
   ];
   types = [
     { id: 1, name: 'Add' },
-    { id: 2, name: 'Edit' },
-    { id: 3, name: 'Home' },
+    { id: 2, name: 'List' },
+    { id: 3, name: 'Insert' },
   ];
   validations = [
     { id: 1, name: 'Required' },
@@ -84,9 +85,14 @@ export class FormComponent {
     this.service
       .generateModuleComponent(this.codeForm.value.component)
       .subscribe((result) => {
-        if (result) {
-          alert('Code generated');
-        }
+        console.log('result', result);
+        this.service
+          .generateAPICode(this.codeForm.value.component)
+          .subscribe((resultApi) => {
+            if (resultApi) {
+              alert('Code generated');
+            }
+          });
       });
   }
 }
