@@ -27,7 +27,7 @@ app.use(cors()); // include before other routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.json({ result: true });
 });
 app.post('/project-setup', async (req, res) => {
   console.log('req.body', req.body);
@@ -90,7 +90,15 @@ app.post('/project-setup', async (req, res) => {
                                 console.log(
                                   'Successfully inserted resultComponentStructure'
                                 );
-                                res.send(JSON.stringify({ result: true }));
+                                if (res.headersSent !== true) {
+                                  // res.setHeader(
+                                  //   'Content-Type',
+                                  //   'application/json'
+                                  // );
+                                  return res
+                                    .contentType('application/json')
+                                    .jsonp({ result: true });
+                                }
                                 // let post_data = querystring.stringify({
                                 //   parentModuleName,
                                 //   newModuleName,
@@ -190,7 +198,10 @@ app.post('/login-api-code-add', async (req, res) => {
             dbOprations('dynamo', tableNameForTransaction, fields).subscribe(
               (response: boolean) => {
                 if (response) {
-                  res.send(JSON.stringify({ result: true }));
+                  // res.setHeader('Content-Type', 'application/json');
+                  if (res.headersSent !== true) {
+                    res.contentType('application/json').jsonp({ result: true });
+                  }
                 }
               }
             );

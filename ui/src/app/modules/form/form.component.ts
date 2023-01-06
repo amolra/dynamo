@@ -26,11 +26,11 @@ export class FormComponent {
     { id: 3, name: 'Insert' },
   ];
   validations = [
-    { id: 1, name: 'Required' },
-    { id: 2, name: 'SpacesNotAllowed' },
-    { id: 3, name: 'MaxLength(100)' },
-    { id: 4, name: 'Unique' },
-    { id: 5, name: 'Email' },
+    { id: 1, name: 'required' },
+    { id: 2, name: 'spacesNotAllowed' },
+    { id: 3, name: 'maxLength(100)' },
+    { id: 4, name: 'unique' },
+    { id: 5, name: 'email' },
   ];
   codeForm: FormGroup;
   constructor(private fb: FormBuilder, public service: FormService) {

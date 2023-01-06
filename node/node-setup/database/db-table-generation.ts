@@ -41,9 +41,9 @@ export async function createTable(
       tableFields = `${ele.fieldName} varchar(${ele.lengthOfField})`;
       fieldArray.push(tableFields);
     });
-    const queryStr = `CREATE OR REPLACE TABLE ${tableName} (id int,${fieldArray.join(
+    const queryStr = `CREATE OR REPLACE TABLE ${tableName} (id int NOT NULL AUTO_INCREMENT,${fieldArray.join(
       ','
-    )})`;
+    )},PRIMARY KEY (id))`;
     console.log('queryStr', queryStr);
     const result = await pool.query(queryStr);
     subToReturn.next(true);

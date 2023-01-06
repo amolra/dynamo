@@ -27,7 +27,7 @@ app.use((0, cors_1.default)()); // include before other routes
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.json({ result: true });
 });
 app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('req.body', req.body);
@@ -53,7 +53,15 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
                                                     console.log('resultComponentStructure', resultComponentStructure);
                                                     if (resultComponentStructure) {
                                                         console.log('Successfully inserted resultComponentStructure');
-                                                        res.send(JSON.stringify({ result: true }));
+                                                        if (res.headersSent !== true) {
+                                                            // res.setHeader(
+                                                            //   'Content-Type',
+                                                            //   'application/json'
+                                                            // );
+                                                            return res
+                                                                .contentType('application/json')
+                                                                .jsonp({ result: true });
+                                                        }
                                                         // let post_data = querystring.stringify({
                                                         //   parentModuleName,
                                                         //   newModuleName,
@@ -143,7 +151,10 @@ app.post('/login-api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, 
                     if (resultcreateIndexTs) {
                         (0, db_table_generation_1.dbOprations)('dynamo', tableNameForTransaction, fields).subscribe((response) => {
                             if (response) {
-                                res.send(JSON.stringify({ result: true }));
+                                // res.setHeader('Content-Type', 'application/json');
+                                if (res.headersSent !== true) {
+                                    res.contentType('application/json').jsonp({ result: true });
+                                }
                             }
                         });
                     }

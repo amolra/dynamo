@@ -77,7 +77,7 @@ export function fieldHtml(
     <form class="example-form" [formGroup]="${componentName}Form">
     ${formInnerHtml}
     <button mat-raised-button color="primary" (click)="submit()">Submit</button>
-    <span *ngIf="show"> <button mat-button color="accent">Login success !!</button></span>
+    <span *ngIf="show"> <button mat-button color="accent">${componentName} success !!</button></span>
     </form>
     </div>`,
     'utf-8'
