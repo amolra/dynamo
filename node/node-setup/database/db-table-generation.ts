@@ -30,7 +30,7 @@ export async function useDatabase(
   return subToReturn.asObservable();
 }
 export async function createTable(
-  componentName: string,
+  tableName: string,
   fields: fields[]
 ): Promise<Observable<boolean>> {
   const subToReturn = new BehaviorSubject<boolean>(false);
@@ -41,7 +41,7 @@ export async function createTable(
       tableFields = `${ele.fieldName} varchar(${ele.lengthOfField})`;
       fieldArray.push(tableFields);
     });
-    const queryStr = `CREATE OR REPLACE TABLE ${componentName} (id int,${fieldArray.join(
+    const queryStr = `CREATE OR REPLACE TABLE ${tableName} (id int,${fieldArray.join(
       ','
     )})`;
     console.log('queryStr', queryStr);
@@ -56,7 +56,7 @@ export async function createTable(
 }
 export function dbOprations(
   dbName: string,
-  componentName: string,
+  tableName: string,
   fields: fields[]
 ): Observable<boolean> {
   const subToReturn = new Subject<boolean>();
@@ -68,7 +68,7 @@ export function dbOprations(
           responseUseDB.subscribe((respDb: boolean) => {
             console.log('respDb', respDb);
             if (respDb) {
-              createTable(componentName, fields).then(
+              createTable(tableName, fields).then(
                 (responseCreateTable: Observable<boolean>) => {
                   responseCreateTable.subscribe((respCreateTable: boolean) => {
                     console.log('respCreateTable', respCreateTable);

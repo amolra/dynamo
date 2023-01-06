@@ -1,4 +1,4 @@
-import { angularDirPathForDownload } from '../../constants';
+import { angularDirPathForDownload, srcFile } from '../../constants';
 import fs from 'fs';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
@@ -13,6 +13,23 @@ export function editAppHtml(): Observable<boolean> {
   console.log(appHtmlFile);
 
   fs.writeFileSync(appHtmlFile, '<router-outlet></router-outlet>', 'utf-8');
+  subToReturn.next(true);
+  console.log('write file complete');
+  return subToReturn.asObservable();
+}
+export function editCss(): Observable<boolean> {
+  const subToReturn = new BehaviorSubject<boolean>(false);
+  const appHtmlFile = srcFile + '/styles.css';
+  console.log(appHtmlFile);
+
+  fs.writeFileSync(
+    appHtmlFile,
+    `body {
+    text-align:center;
+    margin: auto;
+  }`,
+    'utf-8'
+  );
   subToReturn.next(true);
   console.log('write file complete');
   return subToReturn.asObservable();
@@ -381,35 +398,39 @@ export function appModuleChanges(
 
   editAppHtml().subscribe((res: boolean) => {
     if (res) {
-      createMaterialModule().subscribe((materialOutPut: boolean) => {
-        if (materialOutPut) {
-          editAppRouting().subscribe((result: boolean) => {
-            if (result) {
-              insertAppRouting(parentModuleName, newModuleName).subscribe(
-                (re: boolean) => {
-                  if (re) {
-                    addModuleDependacies(
-                      parentModuleName,
-                      newModuleName,
-                      componentName
-                    ).subscribe((resultCreation: boolean) => {
-                      if (resultCreation) {
-                        createCustomValidator().subscribe(
-                          (resultCreateCustomValidator: boolean) => {
-                            if (resultCreateCustomValidator) {
-                              addModulesInAppModule().subscribe(
-                                (resultAddModulesInAppModule: boolean) => {
-                                  subToReturn.next(true);
+      editCss().subscribe((resp: boolean) => {
+        if (resp) {
+          createMaterialModule().subscribe((materialOutPut: boolean) => {
+            if (materialOutPut) {
+              editAppRouting().subscribe((result: boolean) => {
+                if (result) {
+                  insertAppRouting(parentModuleName, newModuleName).subscribe(
+                    (re: boolean) => {
+                      if (re) {
+                        addModuleDependacies(
+                          parentModuleName,
+                          newModuleName,
+                          componentName
+                        ).subscribe((resultCreation: boolean) => {
+                          if (resultCreation) {
+                            createCustomValidator().subscribe(
+                              (resultCreateCustomValidator: boolean) => {
+                                if (resultCreateCustomValidator) {
+                                  addModulesInAppModule().subscribe(
+                                    (resultAddModulesInAppModule: boolean) => {
+                                      subToReturn.next(true);
+                                    }
+                                  );
                                 }
-                              );
-                            }
+                              }
+                            );
                           }
-                        );
+                        });
                       }
-                    });
-                  }
+                    }
+                  );
                 }
-              );
+              });
             }
           });
         }

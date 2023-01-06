@@ -12,4 +12,6 @@ export interface requestFields {
   componentName: string;
   fields: fields[];
   serviceMethodName: string;
+  tableName: string;
+  tableNameForTransaction: string;
 }

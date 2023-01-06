@@ -34,7 +34,7 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
     yield (0, index_1.createprojectStructure)().subscribe((result) => __awaiter(void 0, void 0, void 0, function* () {
         if (result) {
             req.body.forEach((element) => __awaiter(void 0, void 0, void 0, function* () {
-                const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, } = element;
+                const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, tableName, tableNameForTransaction, } = element;
                 yield (0, index_1.createModules)(parentModuleName, newModuleName).subscribe((resultcreateModules) => {
                     if (resultcreateModules) {
                         (0, index_1.createComponentService)(parentModuleName, newModuleName, componentName).subscribe((resultcreateComponentService) => __awaiter(void 0, void 0, void 0, function* () {
@@ -133,14 +133,22 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
 // });
 app.post('/login-api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('req.body', req.body);
-    const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, } = req.body;
-    yield (0, node_setup_1.ApiSetting)(parentModuleName, newModuleName, componentName, fields, serviceMethodName).subscribe((result) => {
+    yield (0, node_setup_1.ApiSetting)().subscribe((result) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('result', result);
-        if (result)
+        if (result) {
+            yield req.body.forEach((element) => __awaiter(void 0, void 0, void 0, function* () {
+                console.log('element', element);
+                const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, tableNameForTransaction, typeOfOpration, } = element;
+                (0, node_setup_1.createIndexTs)(componentName, fields, serviceMethodName, typeOfOpration, tableNameForTransaction).subscribe((resultcreateIndexTs) => {
+                    if (resultcreateIndexTs) {
+                    }
+                });
+            }));
             res.send('Successfully created api');
+        }
         else
             res.send('API Failed');
-    });
+    }));
 }));
 app.get('/mysql-connect-api', (req, res) => {
     // dabataseManipulation().then((response: Observable<boolean>) => {
@@ -183,44 +191,21 @@ app.get('/mysql-connect-api', (req, res) => {
         },
     ];
     (0, db_table_generation_1.dbOprations)('dynamo', 'register', fields).subscribe((response) => {
-        if (response)
+        if (response) {
             res.send('Successdully connected to db');
+        }
     });
     // res.send('Loading ....');
 });
-app.get('/login-api', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let post_data = querystring.stringify({
-        parentModuleName: 'app',
-        newModuleName: 'login',
-        componentName: 'login',
-        serviceMethodName: 'login',
-        fields: [
-            {
-                fieldName: 'userName',
-                fieldLabel: 'User Name',
-                fieldNameBackend: 'userName',
-                lengthOfField: '100',
-                typeOfField: 'text',
-                validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
-            },
-            {
-                fieldName: 'password',
-                fieldLabel: 'password',
-                fieldNameBackend: 'password',
-                lengthOfField: '100',
-                typeOfField: 'password',
-                validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
-            },
-        ],
-    });
+app.post('/login-api', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('post_data', req.body);
     let request = yield http_1.default.request({
         host: 'localhost',
         port: 3000,
         path: '/login-api-code-add',
         method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': Buffer.byteLength(post_data),
+            'Content-Type': 'application/json',
             // headers such as "Cookie" can be extracted from req object and sent to /test
         },
     }, function (response) {
@@ -233,7 +218,7 @@ app.get('/login-api', (req, res) => __awaiter(void 0, void 0, void 0, function* 
             res.end('check result: ' + data);
         });
     });
-    request.write(post_data);
+    request.write(JSON.stringify(req.body));
     request.end();
 }));
 app.listen(port, () => {
