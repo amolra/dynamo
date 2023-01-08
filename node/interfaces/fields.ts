@@ -14,4 +14,5 @@ export interface requestFields {
   serviceMethodName: string;
   tableName: string;
   tableNameForTransaction: string;
+  typeOfOpration: string;
 }

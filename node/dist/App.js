@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const app_component_edit_1 = require("./angular-setup/file-base-edit/app-component-edit");
+// import { loginStructure } from './angular-setup/file-base-edit/login-code-add';
 const index_1 = require("./angular-setup/index");
 const node_setup_1 = require("./node-setup");
 const add_fields_in_files_1 = require("./angular-setup/file-base-edit/add-fields-in-files");
@@ -34,12 +35,11 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
     yield (0, index_1.createprojectStructure)().subscribe((result) => __awaiter(void 0, void 0, void 0, function* () {
         if (result) {
             req.body.forEach((element) => __awaiter(void 0, void 0, void 0, function* () {
-                const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, tableName, tableNameForTransaction, } = element;
+                const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, tableName, tableNameForTransaction, typeOfOpration, } = element;
                 yield (0, index_1.createModules)(parentModuleName, newModuleName).subscribe((resultcreateModules) => {
                     if (resultcreateModules) {
                         (0, index_1.createComponentService)(parentModuleName, newModuleName, componentName).subscribe((resultcreateComponentService) => __awaiter(void 0, void 0, void 0, function* () {
                             if (resultcreateComponentService) {
-                                // subToReturn.next(true);
                                 console.log('result', result);
                                 yield (0, app_component_edit_1.addModulesInAppModule)().subscribe((resultAddModulesInAppModule) => __awaiter(void 0, void 0, void 0, function* () {
                                     console.log('resultAddModulesInAppModule', resultAddModulesInAppModule);
@@ -49,53 +49,15 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
                                             console.log('resultAppModuleChanges', resultAppModuleChanges);
                                             if (resultAppModuleChanges) {
                                                 console.log('Successfully inserted app module');
-                                                yield (0, add_fields_in_files_1.componentStructure)(parentModuleName, newModuleName, componentName, fields, serviceMethodName).subscribe((resultComponentStructure) => {
+                                                yield (0, add_fields_in_files_1.componentStructure)(parentModuleName, newModuleName, componentName, fields, serviceMethodName, typeOfOpration).subscribe((resultComponentStructure) => {
                                                     console.log('resultComponentStructure', resultComponentStructure);
                                                     if (resultComponentStructure) {
                                                         console.log('Successfully inserted resultComponentStructure');
                                                         if (res.headersSent !== true) {
-                                                            // res.setHeader(
-                                                            //   'Content-Type',
-                                                            //   'application/json'
-                                                            // );
                                                             return res
                                                                 .contentType('application/json')
                                                                 .jsonp({ result: true });
                                                         }
-                                                        // let post_data = querystring.stringify({
-                                                        //   parentModuleName,
-                                                        //   newModuleName,
-                                                        //   componentName,
-                                                        //   fields,
-                                                        //   serviceMethodName,
-                                                        // });
-                                                        // let request = await http.request(
-                                                        //   {
-                                                        //     host: 'localhost',
-                                                        //     port: 3000,
-                                                        //     path: '/login-api-code-add',
-                                                        //     method: 'POST',
-                                                        //     headers: {
-                                                        //       'Content-Type':
-                                                        //         'application/x-www-form-urlencoded',
-                                                        //       'Content-Length':
-                                                        //         Buffer.byteLength(post_data),
-                                                        //       // headers such as "Cookie" can be extracted from req object and sent to /test
-                                                        //     },
-                                                        //   },
-                                                        //   function (response) {
-                                                        //     var data = 'amol="rajhans"';
-                                                        //     response.setEncoding('utf8');
-                                                        //     response.on('data', (chunk) => {
-                                                        //       data += chunk;
-                                                        //     });
-                                                        //     response.on('end', () => {
-                                                        //       res.end('check result: ' + data);
-                                                        //     });
-                                                        //   }
-                                                        // );
-                                                        // request.write(post_data);
-                                                        // request.end();
                                                     }
                                                     else
                                                         res.send('resultComponentStructure API Failed');
@@ -118,28 +80,7 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
             res.send('installed API Failed');
     }));
 }));
-// app.get('/add-modules-in-app', async (req, res) => {
-//   await addModulesInAppModule().subscribe((result: boolean) => {
-//     console.log('result', result);
-//     if (result) res.send('reading app module');
-//     else res.send('API Failed');
-//   });
-// });
-// app.get('/app-file-code-add', async (req, res) => {
-//   await appModuleChanges().subscribe((result: boolean) => {
-//     console.log('result', result);
-//     if (result) res.send('Successfully inserted app module');
-//     else res.send('API Failed');
-//   });
-// });
-// app.get('/login-file-code-add', async (req, res) => {
-//   await loginStructure().subscribe((result: boolean) => {
-//     console.log('result', result);
-//     if (result) res.send('Successfully inserted login module');
-//     else res.send('API Failed');
-//   });
-// });
-app.post('/login-api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post('/api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('req.body', req.body);
     yield (0, node_setup_1.ApiSetting)().subscribe((result) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('result', result);
@@ -149,14 +90,23 @@ app.post('/login-api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, 
                 const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, tableNameForTransaction, typeOfOpration, } = element;
                 (0, node_setup_1.createIndexTs)(componentName, fields, serviceMethodName, typeOfOpration, tableNameForTransaction).subscribe((resultcreateIndexTs) => {
                     if (resultcreateIndexTs) {
-                        (0, db_table_generation_1.dbOprations)('dynamo', tableNameForTransaction, fields).subscribe((response) => {
-                            if (response) {
-                                // res.setHeader('Content-Type', 'application/json');
-                                if (res.headersSent !== true) {
-                                    res.contentType('application/json').jsonp({ result: true });
+                        if (typeOfOpration !== 'List') {
+                            (0, db_table_generation_1.dbOprations)('dynamo', tableNameForTransaction, fields).subscribe((response) => {
+                                if (response) {
+                                    // res.setHeader('Content-Type', 'application/json');
+                                    if (res.headersSent !== true) {
+                                        res
+                                            .contentType('application/json')
+                                            .jsonp({ result: true });
+                                    }
                                 }
+                            });
+                        }
+                        else {
+                            if (res.headersSent !== true) {
+                                res.contentType('application/json').jsonp({ result: true });
                             }
-                        });
+                        }
                     }
                 });
             }));
@@ -165,12 +115,31 @@ app.post('/login-api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, 
             res.send('API Failed');
     }));
 }));
+app.post('/api-generate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('post_data', req.body);
+    let request = yield http_1.default.request({
+        host: 'localhost',
+        port: 3000,
+        path: '/api-code-add',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // headers such as "Cookie" can be extracted from req object and sent to /test
+        },
+    }, function (response) {
+        var data = '';
+        response.setEncoding('utf8');
+        response.on('data', (chunk) => {
+            data += chunk;
+        });
+        response.on('end', () => {
+            res.end('check result: ' + data);
+        });
+    });
+    request.write(JSON.stringify(req.body));
+    request.end();
+}));
 app.get('/mysql-connect-api', (req, res) => {
-    // dabataseManipulation().then((response: Observable<boolean>) => {
-    //   response.subscribe((resp: boolean) => {
-    //     if (resp) res.send('Successfully connected mysql');
-    //   });
-    // });
     const fields = [
         {
             fieldName: 'userName',
@@ -212,30 +181,6 @@ app.get('/mysql-connect-api', (req, res) => {
     });
     // res.send('Loading ....');
 });
-app.post('/login-api', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('post_data', req.body);
-    let request = yield http_1.default.request({
-        host: 'localhost',
-        port: 3000,
-        path: '/login-api-code-add',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            // headers such as "Cookie" can be extracted from req object and sent to /test
-        },
-    }, function (response) {
-        var data = '';
-        response.setEncoding('utf8');
-        response.on('data', (chunk) => {
-            data += chunk;
-        });
-        response.on('end', () => {
-            res.end('check result: ' + data);
-        });
-    });
-    request.write(JSON.stringify(req.body));
-    request.end();
-}));
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });

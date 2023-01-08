@@ -18,7 +18,7 @@ export class FormService {
   }
   public generateAPICode(moduleObj: IModule[]): Observable<IModule[]> {
     return this.httpClient.post<IModule[]>(
-      this.apiURL + 'login-api',
+      this.apiURL + 'api-generate',
       moduleObj
     );
   }

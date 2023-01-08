@@ -4,7 +4,7 @@ import {
   addModulesInAppModule,
   appModuleChanges,
 } from './angular-setup/file-base-edit/app-component-edit';
-import { loginStructure } from './angular-setup/file-base-edit/login-code-add';
+// import { loginStructure } from './angular-setup/file-base-edit/login-code-add';
 import {
   createComponentService,
   createModules,
@@ -42,6 +42,7 @@ app.post('/project-setup', async (req, res) => {
           serviceMethodName,
           tableName,
           tableNameForTransaction,
+          typeOfOpration,
         } = element;
         await createModules(parentModuleName, newModuleName).subscribe(
           (resultcreateModules: boolean) => {
@@ -52,8 +53,6 @@ app.post('/project-setup', async (req, res) => {
                 componentName
               ).subscribe(async (resultcreateComponentService: boolean) => {
                 if (resultcreateComponentService) {
-                  // subToReturn.next(true);
-
                   console.log('result', result);
 
                   await addModulesInAppModule().subscribe(
@@ -80,7 +79,8 @@ app.post('/project-setup', async (req, res) => {
                               newModuleName,
                               componentName,
                               fields,
-                              serviceMethodName
+                              serviceMethodName,
+                              typeOfOpration
                             ).subscribe((resultComponentStructure: boolean) => {
                               console.log(
                                 'resultComponentStructure',
@@ -91,48 +91,10 @@ app.post('/project-setup', async (req, res) => {
                                   'Successfully inserted resultComponentStructure'
                                 );
                                 if (res.headersSent !== true) {
-                                  // res.setHeader(
-                                  //   'Content-Type',
-                                  //   'application/json'
-                                  // );
                                   return res
                                     .contentType('application/json')
                                     .jsonp({ result: true });
                                 }
-                                // let post_data = querystring.stringify({
-                                //   parentModuleName,
-                                //   newModuleName,
-                                //   componentName,
-                                //   fields,
-                                //   serviceMethodName,
-                                // });
-                                // let request = await http.request(
-                                //   {
-                                //     host: 'localhost',
-                                //     port: 3000,
-                                //     path: '/login-api-code-add',
-                                //     method: 'POST',
-                                //     headers: {
-                                //       'Content-Type':
-                                //         'application/x-www-form-urlencoded',
-                                //       'Content-Length':
-                                //         Buffer.byteLength(post_data),
-                                //       // headers such as "Cookie" can be extracted from req object and sent to /test
-                                //     },
-                                //   },
-                                //   function (response) {
-                                //     var data = 'amol="rajhans"';
-                                //     response.setEncoding('utf8');
-                                //     response.on('data', (chunk) => {
-                                //       data += chunk;
-                                //     });
-                                //     response.on('end', () => {
-                                //       res.end('check result: ' + data);
-                                //     });
-                                //   }
-                                // );
-                                // request.write(post_data);
-                                // request.end();
                               } else
                                 res.send('resultComponentStructure API Failed');
                             });
@@ -150,28 +112,8 @@ app.post('/project-setup', async (req, res) => {
     } else res.send('installed API Failed');
   });
 });
-// app.get('/add-modules-in-app', async (req, res) => {
-//   await addModulesInAppModule().subscribe((result: boolean) => {
-//     console.log('result', result);
-//     if (result) res.send('reading app module');
-//     else res.send('API Failed');
-//   });
-// });
-// app.get('/app-file-code-add', async (req, res) => {
-//   await appModuleChanges().subscribe((result: boolean) => {
-//     console.log('result', result);
-//     if (result) res.send('Successfully inserted app module');
-//     else res.send('API Failed');
-//   });
-// });
-// app.get('/login-file-code-add', async (req, res) => {
-//   await loginStructure().subscribe((result: boolean) => {
-//     console.log('result', result);
-//     if (result) res.send('Successfully inserted login module');
-//     else res.send('API Failed');
-//   });
-// });
-app.post('/login-api-code-add', async (req, res) => {
+
+app.post('/api-code-add', async (req, res) => {
   console.log('req.body', req.body);
   await ApiSetting().subscribe(async (result: boolean) => {
     console.log('result', result);
@@ -195,28 +137,59 @@ app.post('/login-api-code-add', async (req, res) => {
           tableNameForTransaction
         ).subscribe((resultcreateIndexTs: boolean) => {
           if (resultcreateIndexTs) {
-            dbOprations('dynamo', tableNameForTransaction, fields).subscribe(
-              (response: boolean) => {
-                if (response) {
-                  // res.setHeader('Content-Type', 'application/json');
-                  if (res.headersSent !== true) {
-                    res.contentType('application/json').jsonp({ result: true });
+            if (typeOfOpration !== 'List') {
+              dbOprations('dynamo', tableNameForTransaction, fields).subscribe(
+                (response: boolean) => {
+                  if (response) {
+                    // res.setHeader('Content-Type', 'application/json');
+                    if (res.headersSent !== true) {
+                      res
+                        .contentType('application/json')
+                        .jsonp({ result: true });
+                    }
                   }
                 }
+              );
+            } else {
+              if (res.headersSent !== true) {
+                res.contentType('application/json').jsonp({ result: true });
               }
-            );
+            }
           }
         });
       });
     } else res.send('API Failed');
   });
 });
+
+app.post('/api-generate', async (req, res) => {
+  console.log('post_data', req.body);
+  let request = await http.request(
+    {
+      host: 'localhost',
+      port: 3000,
+      path: '/api-code-add',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // headers such as "Cookie" can be extracted from req object and sent to /test
+      },
+    },
+    function (response) {
+      var data = '';
+      response.setEncoding('utf8');
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+      response.on('end', () => {
+        res.end('check result: ' + data);
+      });
+    }
+  );
+  request.write(JSON.stringify(req.body));
+  request.end();
+});
 app.get('/mysql-connect-api', (req, res) => {
-  // dabataseManipulation().then((response: Observable<boolean>) => {
-  //   response.subscribe((resp: boolean) => {
-  //     if (resp) res.send('Successfully connected mysql');
-  //   });
-  // });
   const fields: fields[] = [
     {
       fieldName: 'userName',
@@ -257,33 +230,6 @@ app.get('/mysql-connect-api', (req, res) => {
     }
   });
   // res.send('Loading ....');
-});
-app.post('/login-api', async (req, res) => {
-  console.log('post_data', req.body);
-  let request = await http.request(
-    {
-      host: 'localhost',
-      port: 3000,
-      path: '/login-api-code-add',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // headers such as "Cookie" can be extracted from req object and sent to /test
-      },
-    },
-    function (response) {
-      var data = '';
-      response.setEncoding('utf8');
-      response.on('data', (chunk) => {
-        data += chunk;
-      });
-      response.on('end', () => {
-        res.end('check result: ' + data);
-      });
-    }
-  );
-  request.write(JSON.stringify(req.body));
-  request.end();
 });
 
 app.listen(port, () => {

@@ -217,7 +217,7 @@ export function createIndexTs(
 
   let contentApi = ``;
   if (typeOfOpration === 'List') {
-    contentApi = ` app.post('/${serviceMethodName}', (req: Request, res: Response) => {
+    contentApi = ` app.get('/${serviceMethodName}', (req: Request, res: Response) => {
       console.log('receiving data ...');
       console.log('body is ',req.body);
       selectQuery('${tableNameForTransaction}').then((resp)=>{

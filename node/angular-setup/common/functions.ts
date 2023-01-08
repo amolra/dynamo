@@ -100,7 +100,8 @@ export function insertServiceDependacies(
 }
 export function createServiceFunction(
   appModuleFile: string,
-  serviceMethodName: string
+  serviceMethodName: string,
+  typeOfOpration: string
 ): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
   const data = fs.readFileSync(appModuleFile).toString().split('\n');
@@ -109,11 +110,23 @@ export function createServiceFunction(
   const lastIndex = data
     .reverse()
     .findIndex((ele) => ele.includes(moduleNameToInsert));
-
-  data.splice(
-    lastIndex + 1,
-    0,
-    `apiURL='http://localhost:4500/'
+  if (typeOfOpration === 'List') {
+    data.splice(
+      lastIndex + 1,
+      0,
+      `apiURL='http://localhost:4500/'
+      public ${serviceMethodName}(): Observable<any> {
+        const url = this.apiURL + '${serviceMethodName}';
+        return this.httpClient
+          .get<any>(url)
+          .pipe(map((data) => data.result));
+      }`
+    );
+  } else {
+    data.splice(
+      lastIndex + 1,
+      0,
+      `apiURL='http://localhost:4500/'
       public ${serviceMethodName}(${serviceMethodName}Obj:any): Observable<boolean> {
         const url = this.apiURL + '${serviceMethodName}';
         return this.httpClient
@@ -122,8 +135,8 @@ export function createServiceFunction(
           })
           .pipe(map((data) => data.result));
       }`
-  );
-
+    );
+  }
   data.reverse();
   const text = data.join('\n');
   // Display the file content
@@ -194,6 +207,7 @@ export function addServicesInComponentFile(
       data[lastIndexconstructor].slice(braceIndex);
     data.reverse();
     const text = data.join('\n');
+    console.log('text', text);
     // Display the file content
     fs.writeFileSync(appModuleFile, text, 'utf-8');
     subToReturn.next(true);
@@ -244,55 +258,98 @@ export function addCustomValidatorInComponentFile(
 export function createReactiveFormInComponentFile(
   appModuleFile: string,
   componentName: string,
-  fields: fields[]
+  fields: fields[],
+  typeOfOpration: string
 ): Observable<boolean> {
-  const subToReturn = new BehaviorSubject<boolean>(false);
-  const data = fs.readFileSync(appModuleFile).toString().split('\n');
-  const moduleNameToInsert = 'constructor() {';
-  if (data.findIndex((ele) => ele.includes(moduleNameToInsert)) !== -1) {
-    console.log('data', moduleNameToInsert);
-    const lastIndex = data
-      .reverse()
-      .findIndex((ele) => ele.includes(moduleNameToInsert));
-    let generateForm = `this.${componentName}Form = fb.group({`;
-    fields.forEach((ele: fields) => {
-      let validateData = ``;
-      ele.validation.forEach((element: string) => {
-        validateData += `CustomValidators.${element},`;
-      });
-      generateForm += `
+  const subToReturnC = new BehaviorSubject<boolean>(false);
+  console.log('typeOfOpration', typeOfOpration);
+  if (typeOfOpration === 'List') {
+    subToReturnC.next(true);
+  } else {
+    const data = fs.readFileSync(appModuleFile).toString().split('\n');
+    const moduleNameToInsert = 'constructor() {';
+    if (data.findIndex((ele) => ele.includes(moduleNameToInsert)) !== -1) {
+      console.log('data', moduleNameToInsert);
+      const lastIndex = data
+        .reverse()
+        .findIndex((ele) => ele.includes(moduleNameToInsert));
+      let generateForm = `this.${componentName}Form = fb.group({`;
+      fields.forEach((ele: fields) => {
+        let validateData = ``;
+        ele.validation.forEach((element: string) => {
+          validateData += `CustomValidators.${element},`;
+        });
+        generateForm += `
             ${ele.fieldName}: new FormControl('', [
                 ${validateData}
             ]),
         `;
-    });
-    generateForm += `});`;
-    console.log('data', generateForm);
-    data.splice(lastIndex, 0, `${generateForm}`);
-    data.reverse();
+      });
+      generateForm += `});`;
+      console.log('data', generateForm);
+      data.splice(lastIndex, 0, `${generateForm}`);
+      data.reverse();
 
-    const text = data.join('\n');
-    fs.writeFileSync(appModuleFile, text, 'utf-8');
-    subToReturn.next(true);
+      const text = data.join('\n');
+      fs.writeFileSync(appModuleFile, text, 'utf-8');
+      subToReturnC.next(true);
+    }
   }
-  return subToReturn.asObservable();
+  return subToReturnC.asObservable();
 }
 export function addDependaciesReactiveFormInComponentFile(
   appModuleFile: string,
-  componentName: string
+  componentName: string,
+  typeOfOpration: string,
+  serviceMethodName: string
 ): Observable<boolean> {
-  const subToReturn = new BehaviorSubject<boolean>(false);
+  const subToReturnA = new BehaviorSubject<boolean>(false);
   const data = fs.readFileSync(appModuleFile).toString().split('\n');
   const moduleNameToInsert = 'constructor(';
-  if (data.findIndex((ele) => ele.includes(moduleNameToInsert)) !== -1) {
-    const lastIndex = data
-      .reverse()
-      .findIndex((ele) => ele.includes(moduleNameToInsert));
-    const formName = `${componentName}Form`;
-    data.splice(
-      lastIndex + 1,
-      0,
-      `${formName}: FormGroup;
+  if (typeOfOpration === 'List') {
+    if (data.findIndex((ele) => ele.includes(moduleNameToInsert)) !== -1) {
+      const lastIndex = data
+        .reverse()
+        .findIndex((ele) => ele.includes(moduleNameToInsert));
+      data.splice(
+        lastIndex + 1,
+        0,
+        `${componentName}Data:any;
+      
+       `
+      );
+      data.splice(
+        lastIndex,
+        0,
+        `
+            this.${componentName}Service.${serviceMethodName}().subscribe((res)=>{
+                this.${componentName}Data = res;
+            });
+       
+      `
+      );
+      const braceIndex = data[lastIndex].indexOf('(') + 1;
+      // data[lastIndex] =
+      //   data[lastIndex].slice(0, braceIndex) +
+      //   `public fb: FormBuilder,` +
+      //   data[lastIndex].slice(braceIndex);
+      data.reverse();
+      const text = data.join('\n');
+      // Display the file content
+      fs.writeFileSync(appModuleFile, text, 'utf-8');
+
+      subToReturnA.next(true);
+    }
+  } else {
+    if (data.findIndex((ele) => ele.includes(moduleNameToInsert)) !== -1) {
+      const lastIndex = data
+        .reverse()
+        .findIndex((ele) => ele.includes(moduleNameToInsert));
+      const formName = `${componentName}Form`;
+      data.splice(
+        lastIndex + 1,
+        0,
+        `${formName}: FormGroup;
     show=false;
     public get f():any {
         return this.${formName}.controls;
@@ -304,22 +361,23 @@ export function addDependaciesReactiveFormInComponentFile(
       submit():void {
         if(this.triggerValidation() && this.${formName}.valid) {
             const ${componentName}Data = this.${formName}.value;
-            this.${componentName}Service.${componentName}(${componentName}Data).subscribe((res)=>{
+            this.${componentName}Service.${serviceMethodName}(${componentName}Data).subscribe((res)=>{
                 this.show = res;
             });
         }
       }`
-    );
-    const braceIndex = data[lastIndex].indexOf('(') + 1;
-    data[lastIndex] =
-      data[lastIndex].slice(0, braceIndex) +
-      `public fb: FormBuilder,` +
-      data[lastIndex].slice(braceIndex);
-    data.reverse();
-    const text = data.join('\n');
-    // Display the file content
-    fs.writeFileSync(appModuleFile, text, 'utf-8');
-    subToReturn.next(true);
+      );
+      const braceIndex = data[lastIndex].indexOf('(') + 1;
+      data[lastIndex] =
+        data[lastIndex].slice(0, braceIndex) +
+        `public fb: FormBuilder,` +
+        data[lastIndex].slice(braceIndex);
+      data.reverse();
+      const text = data.join('\n');
+      // Display the file content
+      fs.writeFileSync(appModuleFile, text, 'utf-8');
+      subToReturnA.next(true);
+    }
   }
-  return subToReturn.asObservable();
+  return subToReturnA.asObservable();
 }
