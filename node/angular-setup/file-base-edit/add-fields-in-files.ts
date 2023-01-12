@@ -116,7 +116,8 @@ export function fieldCss(
   parentModule: string,
   newModule: string,
   componentName: string,
-  fields: fields[]
+  fields: fields[],
+  typeOfOpration: string
 ): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
   const appHtmlFile =
@@ -140,10 +141,23 @@ export function fieldCss(
         componentName +
         '.component.css';
   console.log(appHtmlFile);
-
-  fs.writeFileSync(
-    appHtmlFile,
-    `div {
+  if (typeOfOpration === 'List') {
+    fs.writeFileSync(
+      appHtmlFile,
+      `div {
+      width:20%;
+      margin:auto;
+          
+    }
+    table, th, td {
+      border: 1px solid;
+    }`,
+      'utf-8'
+    );
+  } else {
+    fs.writeFileSync(
+      appHtmlFile,
+      `div {
       width:20%;
       margin:auto;
           
@@ -162,8 +176,9 @@ export function fieldCss(
       mat-error {
         color:red;
       }`,
-    'utf-8'
-  );
+      'utf-8'
+    );
+  }
   subToReturn.next(true);
   console.log('write file complete');
   return subToReturn.asObservable();
@@ -311,34 +326,38 @@ export function componentStructure(
     serviceMethodName
   ).subscribe((res: boolean) => {
     if (res) {
-      fieldCss(parentModule, newModule, componentName, fields).subscribe(
-        (resp: boolean) => {
-          if (resp) {
-            fieldComponentCode(
-              parentModule,
-              newModule,
-              componentName,
-              fields,
-              typeOfOpration,
-              serviceMethodName
-            ).subscribe((result: boolean) => {
-              console.log('fieldComponentCode', result);
-              if (result) {
-                loginService(
-                  parentModule,
-                  newModule,
-                  serviceMethodName,
-                  typeOfOpration
-                ).subscribe((resultInstall: boolean) => {
-                  if (resultInstall) {
-                    subToReturn.next(true);
-                  }
-                });
-              }
-            });
-          }
+      fieldCss(
+        parentModule,
+        newModule,
+        componentName,
+        fields,
+        typeOfOpration
+      ).subscribe((resp: boolean) => {
+        if (resp) {
+          fieldComponentCode(
+            parentModule,
+            newModule,
+            componentName,
+            fields,
+            typeOfOpration,
+            serviceMethodName
+          ).subscribe((result: boolean) => {
+            console.log('fieldComponentCode', result);
+            if (result) {
+              loginService(
+                parentModule,
+                newModule,
+                serviceMethodName,
+                typeOfOpration
+              ).subscribe((resultInstall: boolean) => {
+                if (resultInstall) {
+                  subToReturn.next(true);
+                }
+              });
+            }
+          });
         }
-      );
+      });
     }
   });
   return subToReturn.asObservable();
