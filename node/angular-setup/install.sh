@@ -2,7 +2,7 @@
 if [ ! -d "$1/my-app" ]; then
 npx ng new my-app 
 cd my-app
-npm i @angular/material
+npm i @angular/material@15.0.2
 npx ng generate module app-routing --flat --module=app
 npx ng generate module modules/material --module=app
 else 
