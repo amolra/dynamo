@@ -10,13 +10,15 @@ import {
   projectFolder,
   nodeDir,
   angularDirPathForDownload,
+  reactDir,
 } from '../constants';
 import { fields } from '../interfaces/fields';
 
-export function createFolders(): Observable<boolean> {
+export function createFolders(fetTech: string): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
   const fs = require('fs');
-  let childDirectories = [dir + '/' + angularDir, dir + '/' + nodeDir];
+  const dirCode = fetTech === 'Angular' ? angularDir : reactDir;
+  let childDirectories = [dir + '/' + dirCode, dir + '/' + nodeDir];
   let i = 0;
   childDirectories.forEach((directory) => {
     if (!fs.existsSync(directory)) {
@@ -31,17 +33,19 @@ export function createFolders(): Observable<boolean> {
 
   return subToReturn.asObservable();
 }
-export function install(): Observable<boolean> {
+export function install(fetTech: string): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
-
+  const dir = fetTech === 'Angular' ? angularDir : reactDir;
   exec(
     basePath +
       projectFolder +
-      '/angular-setup/install.sh ' +
+      '/' +
+      fetTech.toLowerCase() +
+      '-setup/install.sh ' +
       basePath +
       baseDirName +
       '/' +
-      angularDir,
+      dir,
     (error, stdout, stderr) => {
       if (error) {
         console.log(`error: ${error}`);
@@ -58,15 +62,19 @@ export function install(): Observable<boolean> {
   return subToReturn.asObservable();
 }
 export function createModules(
+  fetTech: string,
   parentModule: string,
   newModule: string
 ): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
+  const dir = fetTech === 'Angular' ? angularDirPathForDownload : reactDir;
   console.log(
     basePath +
       projectFolder +
-      '/angular-setup/module-creation.sh ' +
-      angularDirPathForDownload +
+      '/' +
+      fetTech.toLowerCase() +
+      '-setup/module-creation.sh ' +
+      dir +
       ' ' +
       parentModule +
       ' ' +
@@ -75,8 +83,10 @@ export function createModules(
   exec(
     basePath +
       projectFolder +
-      '/angular-setup/module-creation.sh ' +
-      angularDirPathForDownload +
+      '/' +
+      fetTech.toLowerCase() +
+      '-setup/module-creation.sh ' +
+      dir +
       ' ' +
       parentModule +
       ' ' +
@@ -97,16 +107,20 @@ export function createModules(
   return subToReturn.asObservable();
 }
 export function createComponentService(
+  fetTech: string,
   parentModule: string,
   newModule: string,
   componentName: string
 ): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
+  const dir = fetTech === 'Angular' ? angularDirPathForDownload : reactDir;
   console.log(
     basePath +
       projectFolder +
-      '/angular-setup/component-creation.sh ' +
-      angularDirPathForDownload +
+      '/' +
+      fetTech.toLowerCase() +
+      '-setup/component-creation.sh ' +
+      dir +
       ' ' +
       parentModule +
       ' ' +
@@ -117,8 +131,10 @@ export function createComponentService(
   exec(
     basePath +
       projectFolder +
-      '/angular-setup/component-creation.sh ' +
-      angularDirPathForDownload +
+      '/' +
+      fetTech.toLowerCase() +
+      '-setup/component-creation.sh ' +
+      dir +
       ' ' +
       parentModule +
       ' ' +
@@ -142,19 +158,23 @@ export function createComponentService(
 }
 export function changeDir(dirName: string): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
+  console.log(
+    "basePath + baseDirName + '/' + dirName",
+    basePath + baseDirName + '/' + dirName
+  );
   process.chdir(basePath + baseDirName + '/' + dirName);
   subToReturn.next(true);
   return subToReturn.asObservable();
 }
 
-export function createprojectStructure(): Observable<boolean> {
+export function createprojectStructure(fetTech: string): Observable<boolean> {
   const subToReturn = new Subject<boolean>();
-
-  createFolders().subscribe((res: boolean) => {
+  const dir = fetTech === 'Angular' ? angularDir : reactDir;
+  createFolders(fetTech).subscribe((res: boolean) => {
     if (res) {
-      changeDir(angularDir).subscribe((result: boolean) => {
+      changeDir(dir).subscribe((result: boolean) => {
         if (result) {
-          install().subscribe((resultInstall: boolean) => {
+          install(fetTech).subscribe((resultInstall: boolean) => {
             if (resultInstall) {
               subToReturn.next(true);
             }

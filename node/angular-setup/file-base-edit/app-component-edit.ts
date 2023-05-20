@@ -1,4 +1,9 @@
-import { angularDirPathForDownload, srcFile } from '../../constants';
+import {
+  angularDirPathForDownload,
+  srcFile,
+  basePath,
+  projectFolder,
+} from '../../constants';
 import fs from 'fs';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
@@ -7,29 +12,34 @@ import {
   makeFirstCharUpperCase,
 } from '../common/functions';
 const directory = angularDirPathForDownload + '/common';
-export function editAppHtml(): Observable<boolean> {
+
+export function editAppHtml(template: string): Observable<boolean> {
+  const templateName = 'templates/' + template;
+  const templatePath = basePath + projectFolder + '/' + templateName;
   const subToReturn = new BehaviorSubject<boolean>(false);
   const appHtmlFile = angularDirPathForDownload + '/app.component.html';
   console.log(appHtmlFile);
-
-  fs.writeFileSync(appHtmlFile, '<router-outlet></router-outlet>', 'utf-8');
+  const dataAppHtml = fs.readFileSync(appHtmlFile).toString();
+  if (!dataAppHtml.includes('<router-outlet></router-outlet>')) {
+    const data = fs
+      .readFileSync(templatePath + '/index.html')
+      .toString()
+      .replace('%internal template%', '<router-outlet></router-outlet>');
+    fs.writeFileSync(appHtmlFile, data, 'utf-8');
+  }
   subToReturn.next(true);
   console.log('write file complete');
   return subToReturn.asObservable();
 }
-export function editCss(): Observable<boolean> {
+export function editCss(template: string): Observable<boolean> {
+  const templateName = 'templates/' + template;
+  const templatePath = basePath + projectFolder + '/' + templateName;
   const subToReturn = new BehaviorSubject<boolean>(false);
+  const templateCssFile = templatePath + '/styles.css';
   const appHtmlFile = srcFile + '/styles.css';
   console.log(appHtmlFile);
-
-  fs.writeFileSync(
-    appHtmlFile,
-    `body {
-    text-align:center;
-    margin: auto;
-  }`,
-    'utf-8'
-  );
+  const data = fs.readFileSync(templateCssFile).toString();
+  fs.writeFileSync(appHtmlFile, data, 'utf-8');
   subToReturn.next(true);
   console.log('write file complete');
   return subToReturn.asObservable();
@@ -98,11 +108,23 @@ export function insertAppRouting(
       data[lastIndex].slice(braceIndex);
 
     // data.splice(lastIndex, 0, dataToInsert);
-
+    const appHtmlFile = angularDirPathForDownload + '/app.component.html';
     data.reverse();
     const text = data.join('\n');
     console.log('text', text);
     // Display the file content
+    const dataMenu = fs.readFileSync(appHtmlFile).toString().split('\n');
+    console.log('dataMenu', dataMenu);
+    const lastIndexMenu = dataMenu.findIndex((ele) =>
+      ele.includes(`<li><a href="#">Home</a></li>`)
+    );
+    console.log('lastIndexMenu', lastIndexMenu);
+    dataMenu.splice(
+      lastIndexMenu + 1,
+      0,
+      `<li><a routerLink="${newModuleName}">${newModuleName}</a></li>`
+    );
+    fs.writeFileSync(appHtmlFile, dataMenu.join('\n'), 'utf-8');
     fs.writeFileSync(appRouteFile, text, 'utf-8');
     subToReturn.next(true);
   }
@@ -390,15 +412,16 @@ export function addModulesInAppModule(): Observable<boolean> {
   return subToReturn.asObservable();
 }
 export function appModuleChanges(
+  template: string,
   parentModuleName: string,
   newModuleName: string,
   componentName: string
 ): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
 
-  editAppHtml().subscribe((res: boolean) => {
+  editAppHtml(template).subscribe((res: boolean) => {
     if (res) {
-      editCss().subscribe((resp: boolean) => {
+      editCss(template).subscribe((resp: boolean) => {
         if (resp) {
           createMaterialModule().subscribe((materialOutPut: boolean) => {
             if (materialOutPut) {

@@ -8,10 +8,11 @@ const rxjs_1 = require("rxjs");
 const shelljs_1 = require("shelljs");
 const process_1 = __importDefault(require("process"));
 const constants_1 = require("../constants");
-function createFolders() {
+function createFolders(fetTech) {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
     const fs = require('fs');
-    let childDirectories = [constants_1.dir + '/' + constants_1.angularDir, constants_1.dir + '/' + constants_1.nodeDir];
+    const dirCode = fetTech === 'Angular' ? constants_1.angularDir : constants_1.reactDir;
+    let childDirectories = [constants_1.dir + '/' + dirCode, constants_1.dir + '/' + constants_1.nodeDir];
     let i = 0;
     childDirectories.forEach((directory) => {
         if (!fs.existsSync(directory)) {
@@ -25,15 +26,18 @@ function createFolders() {
     return subToReturn.asObservable();
 }
 exports.createFolders = createFolders;
-function install() {
+function install(fetTech) {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
+    const dir = fetTech === 'Angular' ? constants_1.angularDir : constants_1.reactDir;
     (0, shelljs_1.exec)(constants_1.basePath +
         constants_1.projectFolder +
-        '/angular-setup/install.sh ' +
+        '/' +
+        fetTech.toLowerCase() +
+        '-setup/install.sh ' +
         constants_1.basePath +
         constants_1.baseDirName +
         '/' +
-        constants_1.angularDir, (error, stdout, stderr) => {
+        dir, (error, stdout, stderr) => {
         if (error) {
             console.log(`error: ${error}`);
             // return;
@@ -48,20 +52,25 @@ function install() {
     return subToReturn.asObservable();
 }
 exports.install = install;
-function createModules(parentModule, newModule) {
+function createModules(fetTech, parentModule, newModule) {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
+    const dir = fetTech === 'Angular' ? constants_1.angularDirPathForDownload : constants_1.reactDir;
     console.log(constants_1.basePath +
         constants_1.projectFolder +
-        '/angular-setup/module-creation.sh ' +
-        constants_1.angularDirPathForDownload +
+        '/' +
+        fetTech.toLowerCase() +
+        '-setup/module-creation.sh ' +
+        dir +
         ' ' +
         parentModule +
         ' ' +
         newModule);
     (0, shelljs_1.exec)(constants_1.basePath +
         constants_1.projectFolder +
-        '/angular-setup/module-creation.sh ' +
-        constants_1.angularDirPathForDownload +
+        '/' +
+        fetTech.toLowerCase() +
+        '-setup/module-creation.sh ' +
+        dir +
         ' ' +
         parentModule +
         ' ' +
@@ -80,12 +89,15 @@ function createModules(parentModule, newModule) {
     return subToReturn.asObservable();
 }
 exports.createModules = createModules;
-function createComponentService(parentModule, newModule, componentName) {
+function createComponentService(fetTech, parentModule, newModule, componentName) {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
+    const dir = fetTech === 'Angular' ? constants_1.angularDirPathForDownload : constants_1.reactDir;
     console.log(constants_1.basePath +
         constants_1.projectFolder +
-        '/angular-setup/component-creation.sh ' +
-        constants_1.angularDirPathForDownload +
+        '/' +
+        fetTech.toLowerCase() +
+        '-setup/component-creation.sh ' +
+        dir +
         ' ' +
         parentModule +
         ' ' +
@@ -94,8 +106,10 @@ function createComponentService(parentModule, newModule, componentName) {
         componentName);
     (0, shelljs_1.exec)(constants_1.basePath +
         constants_1.projectFolder +
-        '/angular-setup/component-creation.sh ' +
-        constants_1.angularDirPathForDownload +
+        '/' +
+        fetTech.toLowerCase() +
+        '-setup/component-creation.sh ' +
+        dir +
         ' ' +
         parentModule +
         ' ' +
@@ -118,18 +132,20 @@ function createComponentService(parentModule, newModule, componentName) {
 exports.createComponentService = createComponentService;
 function changeDir(dirName) {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
+    console.log("basePath + baseDirName + '/' + dirName", constants_1.basePath + constants_1.baseDirName + '/' + dirName);
     process_1.default.chdir(constants_1.basePath + constants_1.baseDirName + '/' + dirName);
     subToReturn.next(true);
     return subToReturn.asObservable();
 }
 exports.changeDir = changeDir;
-function createprojectStructure() {
+function createprojectStructure(fetTech) {
     const subToReturn = new rxjs_1.Subject();
-    createFolders().subscribe((res) => {
+    const dir = fetTech === 'Angular' ? constants_1.angularDir : constants_1.reactDir;
+    createFolders(fetTech).subscribe((res) => {
         if (res) {
-            changeDir(constants_1.angularDir).subscribe((result) => {
+            changeDir(dir).subscribe((result) => {
                 if (result) {
-                    install().subscribe((resultInstall) => {
+                    install(fetTech).subscribe((resultInstall) => {
                         if (resultInstall) {
                             subToReturn.next(true);
                         }

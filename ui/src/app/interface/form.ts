@@ -16,3 +16,9 @@ export interface IModule {
   tableNameForTransaction: string;
   fields: IField[];
 }
+export interface IFormData {
+  fetTech: string;
+  backTech: string;
+  component: IModule[];
+  selectedOption: string;
+}

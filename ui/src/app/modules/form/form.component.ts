@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { FormService } from '../form.service';
 
 @Component({
@@ -33,11 +34,22 @@ export class FormComponent {
     { id: 5, name: 'email' },
   ];
   codeForm: FormGroup;
-  constructor(private fb: FormBuilder, public service: FormService) {
+  options: any;
+  constructor(
+    private fb: FormBuilder,
+    public service: FormService,
+    private toastr: ToastrService
+  ) {
+    this.options = [
+      { value: 'green', label: 'Green', img: './assets/templates/green.png' },
+      { value: 'blue', label: 'Blue', img: './assets/templates/blue.png' },
+    ];
+
     this.codeForm = this.fb.group({
       fetTech: '',
       backTech: '',
       component: this.fb.array([]),
+      selectedTemplate: '',
     });
   }
   component(): FormArray {
@@ -82,13 +94,27 @@ export class FormComponent {
   }
   save(): void {
     console.log(this.codeForm.value);
+    this.toastr.info(
+      'Project structure creation will take 7 to 8 minutes.',
+      'Project Structure Creation'
+    );
+
     this.service
-      .generateModuleComponent(this.codeForm.value.component)
+      .generateModuleComponent(this.codeForm.value)
       .subscribe((result) => {
+        this.toastr.info(
+          this.codeForm.value.fetTech + ' project structure creation done.',
+          'Project Structure'
+        );
         console.log('result', result);
         this.service
           .generateAPICode(this.codeForm.value.component)
           .subscribe((resultApi) => {
+            this.toastr.info(
+              this.codeForm.value.backTech +
+                ' project structure creation done.',
+              'Project Structure'
+            );
             if (resultApi) {
               alert('Code generated');
             }

@@ -9,24 +9,34 @@ const fs_1 = __importDefault(require("fs"));
 const rxjs_1 = require("rxjs");
 const functions_1 = require("../common/functions");
 const directory = constants_1.angularDirPathForDownload + '/common';
-function editAppHtml() {
+function editAppHtml(template) {
+    const templateName = 'templates/' + template;
+    const templatePath = constants_1.basePath + constants_1.projectFolder + '/' + templateName;
     const subToReturn = new rxjs_1.BehaviorSubject(false);
     const appHtmlFile = constants_1.angularDirPathForDownload + '/app.component.html';
     console.log(appHtmlFile);
-    fs_1.default.writeFileSync(appHtmlFile, '<router-outlet></router-outlet>', 'utf-8');
+    const dataAppHtml = fs_1.default.readFileSync(appHtmlFile).toString();
+    if (!dataAppHtml.includes('<router-outlet></router-outlet>')) {
+        const data = fs_1.default
+            .readFileSync(templatePath + '/index.html')
+            .toString()
+            .replace('%internal template%', '<router-outlet></router-outlet>');
+        fs_1.default.writeFileSync(appHtmlFile, data, 'utf-8');
+    }
     subToReturn.next(true);
     console.log('write file complete');
     return subToReturn.asObservable();
 }
 exports.editAppHtml = editAppHtml;
-function editCss() {
+function editCss(template) {
+    const templateName = 'templates/' + template;
+    const templatePath = constants_1.basePath + constants_1.projectFolder + '/' + templateName;
     const subToReturn = new rxjs_1.BehaviorSubject(false);
+    const templateCssFile = templatePath + '/styles.css';
     const appHtmlFile = constants_1.srcFile + '/styles.css';
     console.log(appHtmlFile);
-    fs_1.default.writeFileSync(appHtmlFile, `body {
-    text-align:center;
-    margin: auto;
-  }`, 'utf-8');
+    const data = fs_1.default.readFileSync(templateCssFile).toString();
+    fs_1.default.writeFileSync(appHtmlFile, data, 'utf-8');
     subToReturn.next(true);
     console.log('write file complete');
     return subToReturn.asObservable();
@@ -84,10 +94,17 @@ function insertAppRouting(parentModuleName, newModuleName) {
                 dataToInsert +
                 data[lastIndex].slice(braceIndex);
         // data.splice(lastIndex, 0, dataToInsert);
+        const appHtmlFile = constants_1.angularDirPathForDownload + '/app.component.html';
         data.reverse();
         const text = data.join('\n');
         console.log('text', text);
         // Display the file content
+        const dataMenu = fs_1.default.readFileSync(appHtmlFile).toString().split('\n');
+        console.log('dataMenu', dataMenu);
+        const lastIndexMenu = dataMenu.findIndex((ele) => ele.includes(`<li><a href="#">Home</a></li>`));
+        console.log('lastIndexMenu', lastIndexMenu);
+        dataMenu.splice(lastIndexMenu + 1, 0, `<li><a routerLink="${newModuleName}">${newModuleName}</a></li>`);
+        fs_1.default.writeFileSync(appHtmlFile, dataMenu.join('\n'), 'utf-8');
         fs_1.default.writeFileSync(appRouteFile, text, 'utf-8');
         subToReturn.next(true);
     }
@@ -350,11 +367,11 @@ function addModulesInAppModule() {
     return subToReturn.asObservable();
 }
 exports.addModulesInAppModule = addModulesInAppModule;
-function appModuleChanges(parentModuleName, newModuleName, componentName) {
+function appModuleChanges(template, parentModuleName, newModuleName, componentName) {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
-    editAppHtml().subscribe((res) => {
+    editAppHtml(template).subscribe((res) => {
         if (res) {
-            editCss().subscribe((resp) => {
+            editCss(template).subscribe((resp) => {
                 if (resp) {
                     createMaterialModule().subscribe((materialOutPut) => {
                         if (materialOutPut) {

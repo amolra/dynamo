@@ -31,9 +31,13 @@ app.get('/', (req, res) => {
 });
 app.post('/project-setup', async (req, res) => {
   console.log('req.body', req.body);
-  await createprojectStructure().subscribe(async (result: boolean) => {
+  const template = req.body.selectedTemplate;
+  const fetTech = req.body.fetTech;
+
+  await createprojectStructure(fetTech).subscribe(async (result: boolean) => {
     if (result) {
-      req.body.forEach(async (element: requestFields) => {
+      // return res.contentType('application/json').jsonp({ result: true });
+      req.body.component.forEach(async (element: requestFields) => {
         const {
           parentModuleName,
           newModuleName,
@@ -44,10 +48,11 @@ app.post('/project-setup', async (req, res) => {
           tableNameForTransaction,
           typeOfOpration,
         } = element;
-        await createModules(parentModuleName, newModuleName).subscribe(
+        await createModules(fetTech, parentModuleName, newModuleName).subscribe(
           (resultcreateModules: boolean) => {
             if (resultcreateModules) {
               createComponentService(
+                fetTech,
                 parentModuleName,
                 newModuleName,
                 componentName
@@ -64,6 +69,7 @@ app.post('/project-setup', async (req, res) => {
                       if (resultAddModulesInAppModule) {
                         console.log('reading app module');
                         await appModuleChanges(
+                          template,
                           parentModuleName,
                           newModuleName,
                           componentName

@@ -28,6 +28,8 @@ import { FormComponent } from './modules/form/form.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SpinnerComponent } from './spinner/spinner.component';
 import { LoadingInterceptor } from './loading.interceptor';
+import { MatRadioModule } from '@angular/material/radio';
+import { ToastrModule } from 'ngx-toastr';
 @NgModule({
   declarations: [AppComponent, FormComponent, SpinnerComponent],
   imports: [
@@ -52,6 +54,8 @@ import { LoadingInterceptor } from './loading.interceptor';
     MatChipsModule,
     MatRippleModule,
     HttpClientModule,
+    MatRadioModule,
+    ToastrModule.forRoot(),
   ],
 
   bootstrap: [AppComponent],
