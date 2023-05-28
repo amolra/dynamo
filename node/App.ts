@@ -20,6 +20,7 @@ import {
   useDatabase,
 } from './node-setup/database/db-table-generation';
 import { Observable } from 'rxjs';
+import { createEntireCode } from './angular-setup/module-creation';
 const querystring = require('querystring');
 const app = express();
 const port = 3000;
@@ -37,84 +38,22 @@ app.post('/project-setup', async (req, res) => {
   await createprojectStructure(fetTech).subscribe(async (result: boolean) => {
     if (result) {
       // return res.contentType('application/json').jsonp({ result: true });
-      req.body.component.forEach(async (element: requestFields) => {
-        const {
-          parentModuleName,
-          newModuleName,
-          componentName,
-          fields,
-          serviceMethodName,
-          tableName,
-          tableNameForTransaction,
-          typeOfOpration,
-        } = element;
-        await createModules(fetTech, parentModuleName, newModuleName).subscribe(
-          (resultcreateModules: boolean) => {
-            if (resultcreateModules) {
-              createComponentService(
-                fetTech,
-                parentModuleName,
-                newModuleName,
-                componentName
-              ).subscribe(async (resultcreateComponentService: boolean) => {
-                if (resultcreateComponentService) {
-                  console.log('result', result);
-
-                  await addModulesInAppModule().subscribe(
-                    async (resultAddModulesInAppModule: boolean) => {
-                      console.log(
-                        'resultAddModulesInAppModule',
-                        resultAddModulesInAppModule
-                      );
-                      if (resultAddModulesInAppModule) {
-                        console.log('reading app module');
-                        await appModuleChanges(
-                          template,
-                          parentModuleName,
-                          newModuleName,
-                          componentName
-                        ).subscribe(async (resultAppModuleChanges: boolean) => {
-                          console.log(
-                            'resultAppModuleChanges',
-                            resultAppModuleChanges
-                          );
-                          if (resultAppModuleChanges) {
-                            console.log('Successfully inserted app module');
-                            await componentStructure(
-                              parentModuleName,
-                              newModuleName,
-                              componentName,
-                              fields,
-                              serviceMethodName,
-                              typeOfOpration
-                            ).subscribe((resultComponentStructure: boolean) => {
-                              console.log(
-                                'resultComponentStructure',
-                                resultComponentStructure
-                              );
-                              if (resultComponentStructure) {
-                                console.log(
-                                  'Successfully inserted resultComponentStructure'
-                                );
-                                if (res.headersSent !== true) {
-                                  return res
-                                    .contentType('application/json')
-                                    .jsonp({ result: true });
-                                }
-                              } else
-                                res.send('resultComponentStructure API Failed');
-                            });
-                          } else res.send('inserted app module API Failed');
-                        });
-                      } else res.send('reading app module API Failed');
-                    }
-                  );
-                }
-              });
-            }
-          }
+      if (fetTech === 'Angular') {
+        const responseModuleCreate = await createEntireCode(
+          fetTech,
+          template,
+          req.body.component
         );
-      });
+        responseModuleCreate.subscribe((eleModCreate: boolean) => {
+          if (res.headersSent !== true) {
+            return res
+              .contentType('application/json')
+              .jsonp({ result: eleModCreate });
+          }
+        });
+      } else if (fetTech === 'React') {
+        // React related code need to be done here.
+      }
     } else res.send('installed API Failed');
   });
 });

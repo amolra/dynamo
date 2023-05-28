@@ -41,8 +41,16 @@ export class FormComponent {
     private toastr: ToastrService
   ) {
     this.options = [
-      { value: 'green', label: 'Green', img: './assets/templates/green.png' },
-      { value: 'blue', label: 'Blue', img: './assets/templates/blue.png' },
+      {
+        value: 'green',
+        label: 'Template Green',
+        img: './assets/templates/green.png',
+      },
+      {
+        value: 'blue',
+        label: 'Template Blue',
+        img: './assets/templates/blue.png',
+      },
     ];
 
     this.codeForm = this.fb.group({

@@ -14,13 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const app_component_edit_1 = require("./angular-setup/file-base-edit/app-component-edit");
 // import { loginStructure } from './angular-setup/file-base-edit/login-code-add';
 const index_1 = require("./angular-setup/index");
 const node_setup_1 = require("./node-setup");
-const add_fields_in_files_1 = require("./angular-setup/file-base-edit/add-fields-in-files");
 const http_1 = __importDefault(require("http"));
 const db_table_generation_1 = require("./node-setup/database/db-table-generation");
+const module_creation_1 = require("./angular-setup/module-creation");
 const querystring = require('querystring');
 const app = (0, express_1.default)();
 const port = 3000;
@@ -37,47 +36,19 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
     yield (0, index_1.createprojectStructure)(fetTech).subscribe((result) => __awaiter(void 0, void 0, void 0, function* () {
         if (result) {
             // return res.contentType('application/json').jsonp({ result: true });
-            req.body.component.forEach((element) => __awaiter(void 0, void 0, void 0, function* () {
-                const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, tableName, tableNameForTransaction, typeOfOpration, } = element;
-                yield (0, index_1.createModules)(fetTech, parentModuleName, newModuleName).subscribe((resultcreateModules) => {
-                    if (resultcreateModules) {
-                        (0, index_1.createComponentService)(fetTech, parentModuleName, newModuleName, componentName).subscribe((resultcreateComponentService) => __awaiter(void 0, void 0, void 0, function* () {
-                            if (resultcreateComponentService) {
-                                console.log('result', result);
-                                yield (0, app_component_edit_1.addModulesInAppModule)().subscribe((resultAddModulesInAppModule) => __awaiter(void 0, void 0, void 0, function* () {
-                                    console.log('resultAddModulesInAppModule', resultAddModulesInAppModule);
-                                    if (resultAddModulesInAppModule) {
-                                        console.log('reading app module');
-                                        yield (0, app_component_edit_1.appModuleChanges)(template, parentModuleName, newModuleName, componentName).subscribe((resultAppModuleChanges) => __awaiter(void 0, void 0, void 0, function* () {
-                                            console.log('resultAppModuleChanges', resultAppModuleChanges);
-                                            if (resultAppModuleChanges) {
-                                                console.log('Successfully inserted app module');
-                                                yield (0, add_fields_in_files_1.componentStructure)(parentModuleName, newModuleName, componentName, fields, serviceMethodName, typeOfOpration).subscribe((resultComponentStructure) => {
-                                                    console.log('resultComponentStructure', resultComponentStructure);
-                                                    if (resultComponentStructure) {
-                                                        console.log('Successfully inserted resultComponentStructure');
-                                                        if (res.headersSent !== true) {
-                                                            return res
-                                                                .contentType('application/json')
-                                                                .jsonp({ result: true });
-                                                        }
-                                                    }
-                                                    else
-                                                        res.send('resultComponentStructure API Failed');
-                                                });
-                                            }
-                                            else
-                                                res.send('inserted app module API Failed');
-                                        }));
-                                    }
-                                    else
-                                        res.send('reading app module API Failed');
-                                }));
-                            }
-                        }));
+            if (fetTech === 'Angular') {
+                const responseModuleCreate = yield (0, module_creation_1.createEntireCode)(fetTech, template, req.body.component);
+                responseModuleCreate.subscribe((eleModCreate) => {
+                    if (res.headersSent !== true) {
+                        return res
+                            .contentType('application/json')
+                            .jsonp({ result: eleModCreate });
                     }
                 });
-            }));
+            }
+            else if (fetTech === 'React') {
+                // React related code need to be done here.
+            }
         }
         else
             res.send('installed API Failed');
