@@ -21,6 +21,7 @@ import {
 } from './node-setup/database/db-table-generation';
 import { Observable } from 'rxjs';
 import { createEntireCode } from './angular-setup/module-creation';
+import { setApi } from './node-setup/api-setting';
 const querystring = require('querystring');
 const app = express();
 const port = 3000;
@@ -60,51 +61,18 @@ app.post('/project-setup', async (req, res) => {
 
 app.post('/api-code-add', async (req, res) => {
   console.log('req.body', req.body);
-  await ApiSetting().subscribe(async (result: boolean) => {
-    console.log('result', result);
-    if (result) {
-      await req.body.forEach(async (element: any) => {
-        console.log('element', element);
-        const {
-          parentModuleName,
-          newModuleName,
-          componentName,
-          fields,
-          serviceMethodName,
-          tableNameForTransaction,
-          typeOfOpration,
-        } = element;
-        createIndexTs(
-          componentName,
-          fields,
-          serviceMethodName,
-          typeOfOpration,
-          tableNameForTransaction
-        ).subscribe((resultcreateIndexTs: boolean) => {
-          if (resultcreateIndexTs) {
-            if (typeOfOpration !== 'List') {
-              dbOprations('dynamo', tableNameForTransaction, fields).subscribe(
-                (response: boolean) => {
-                  if (response) {
-                    // res.setHeader('Content-Type', 'application/json');
-                    if (res.headersSent !== true) {
-                      res
-                        .contentType('application/json')
-                        .jsonp({ result: true });
-                    }
-                  }
-                }
-              );
-            } else {
-              if (res.headersSent !== true) {
-                res.contentType('application/json').jsonp({ result: true });
-              }
-            }
-          }
-        });
-      });
-    } else res.send('API Failed');
-  });
+  if (req.body.backTech === 'NodeJs') {
+    const responseSetApi = await setApi(req.body.component);
+    responseSetApi.subscribe((eleModCreate: boolean) => {
+      if (res.headersSent !== true) {
+        return res
+          .contentType('application/json')
+          .jsonp({ result: eleModCreate });
+      }
+    });
+  } else {
+    // Python code need to be added here.
+  }
 });
 
 app.post('/api-generate', async (req, res) => {

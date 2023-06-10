@@ -116,7 +116,7 @@ export class FormComponent {
         );
         console.log('result', result);
         this.service
-          .generateAPICode(this.codeForm.value.component)
+          .generateAPICode(this.codeForm.value)
           .subscribe((resultApi) => {
             this.toastr.info(
               this.codeForm.value.backTech +

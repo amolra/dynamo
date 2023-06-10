@@ -16,7 +16,7 @@ export class FormService {
       moduleObj
     );
   }
-  public generateAPICode(moduleObj: IModule[]): Observable<IModule[]> {
+  public generateAPICode(moduleObj: IFormData): Observable<IModule[]> {
     return this.httpClient.post<IModule[]>(
       this.apiURL + 'api-generate',
       moduleObj

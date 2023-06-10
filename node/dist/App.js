@@ -16,10 +16,10 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 // import { loginStructure } from './angular-setup/file-base-edit/login-code-add';
 const index_1 = require("./angular-setup/index");
-const node_setup_1 = require("./node-setup");
 const http_1 = __importDefault(require("http"));
 const db_table_generation_1 = require("./node-setup/database/db-table-generation");
 const module_creation_1 = require("./angular-setup/module-creation");
+const api_setting_1 = require("./node-setup/api-setting");
 const querystring = require('querystring');
 const app = (0, express_1.default)();
 const port = 3000;
@@ -56,38 +56,19 @@ app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, funct
 }));
 app.post('/api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('req.body', req.body);
-    yield (0, node_setup_1.ApiSetting)().subscribe((result) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('result', result);
-        if (result) {
-            yield req.body.forEach((element) => __awaiter(void 0, void 0, void 0, function* () {
-                console.log('element', element);
-                const { parentModuleName, newModuleName, componentName, fields, serviceMethodName, tableNameForTransaction, typeOfOpration, } = element;
-                (0, node_setup_1.createIndexTs)(componentName, fields, serviceMethodName, typeOfOpration, tableNameForTransaction).subscribe((resultcreateIndexTs) => {
-                    if (resultcreateIndexTs) {
-                        if (typeOfOpration !== 'List') {
-                            (0, db_table_generation_1.dbOprations)('dynamo', tableNameForTransaction, fields).subscribe((response) => {
-                                if (response) {
-                                    // res.setHeader('Content-Type', 'application/json');
-                                    if (res.headersSent !== true) {
-                                        res
-                                            .contentType('application/json')
-                                            .jsonp({ result: true });
-                                    }
-                                }
-                            });
-                        }
-                        else {
-                            if (res.headersSent !== true) {
-                                res.contentType('application/json').jsonp({ result: true });
-                            }
-                        }
-                    }
-                });
-            }));
-        }
-        else
-            res.send('API Failed');
-    }));
+    if (req.body.backTech === 'NodeJs') {
+        const responseSetApi = yield (0, api_setting_1.setApi)(req.body.component);
+        responseSetApi.subscribe((eleModCreate) => {
+            if (res.headersSent !== true) {
+                return res
+                    .contentType('application/json')
+                    .jsonp({ result: eleModCreate });
+            }
+        });
+    }
+    else {
+        // Python code need to be added here.
+    }
 }));
 app.post('/api-generate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('post_data', req.body);
