@@ -1,9 +1,0 @@
-# dependencies
-/node_modules
-/node/node_modules
-/node/dist
-/ui/node_modules
-/ui/dist
-/codes
-/desktop.ini
-/.scannerwork

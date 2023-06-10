@@ -24,6 +24,9 @@ import { createEntireCode } from "./angular-setup/module-creation";
 import { setApi } from "./node-setup/api-setting";
 import { generateTsconfig } from "./react-setup/remaining-setup";
 import { generateCode } from "./react-setup/generateCode/generate-code";
+import { setPythonApi } from "./python-setup/api-setting";
+import { nodeDir, pythonDir, dir } from "./constants";
+import fs, { readFile, writeFile } from "fs";
 const querystring = require("querystring");
 const app = express();
 const port = 3000;
@@ -81,6 +84,13 @@ app.post("/project-setup", async (req, res) => {
 
 app.post("/api-code-add", async (req, res) => {
   console.log("req.body", req.body);
+  const createDir =
+    req.body.backTech === "NodeJs"
+      ? dir + "/" + nodeDir
+      : dir + "/" + pythonDir;
+  if (!fs.existsSync(createDir)) {
+    fs.mkdirSync(createDir, { recursive: true });
+  }
   if (req.body.backTech === "NodeJs") {
     const responseSetApi = await setApi(req.body.component);
     responseSetApi.subscribe((eleModCreate: boolean) => {
@@ -92,6 +102,15 @@ app.post("/api-code-add", async (req, res) => {
     });
   } else {
     // Python code need to be added here.
+
+    const responseSetPythonApi = await setPythonApi(req.body.component);
+    responseSetPythonApi.subscribe((eleModCreate: boolean) => {
+      if (res.headersSent !== true) {
+        return res
+          .contentType("application/json")
+          .jsonp({ result: eleModCreate });
+      }
+    });
   }
 });
 
