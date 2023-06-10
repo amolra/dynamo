@@ -18,7 +18,8 @@ export function createFolders(fetTech: string): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
   const fs = require('fs');
   const dirCode = fetTech === 'Angular' ? angularDir : reactDir;
-  let childDirectories = [dir + '/' + dirCode, dir + '/' + nodeDir];
+  
+  let childDirectories = [dir + '/' + dirCode];
   let i = 0;
   childDirectories.forEach((directory) => {
     if (!fs.existsSync(directory)) {

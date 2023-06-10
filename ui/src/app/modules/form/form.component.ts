@@ -107,15 +107,17 @@ export class FormComponent {
       'Project Structure Creation'
     );
 
-    this.service
-      .generateModuleComponent(this.codeForm.value)
-      .subscribe((result) => {
-        this.toastr.info(
-          this.codeForm.value.fetTech + ' project structure creation done.',
-          'Project Structure'
-        );
-        console.log('result', result);
-        this.service
+    // this.service
+    //   .generateModuleComponent(this.codeForm.value)
+    //   .subscribe((result) => {
+    //     this.toastr.info(
+    //       this.codeForm.value.fetTech + ' project structure creation done.',
+    //       'Project Structure'
+    //     );
+    //     console.log('result', result);
+        
+    //   });
+      this.service
           .generateAPICode(this.codeForm.value)
           .subscribe((resultApi) => {
             this.toastr.info(
@@ -127,6 +129,5 @@ export class FormComponent {
               alert('Code generated');
             }
           });
-      });
   }
 }

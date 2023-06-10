@@ -20,118 +20,135 @@ const http_1 = __importDefault(require("http"));
 const db_table_generation_1 = require("./node-setup/database/db-table-generation");
 const module_creation_1 = require("./angular-setup/module-creation");
 const api_setting_1 = require("./node-setup/api-setting");
-const querystring = require('querystring');
+const api_setting_2 = require("./python-setup/api-setting");
+const constants_1 = require("./constants");
+const fs_1 = __importDefault(require("fs"));
+const querystring = require("querystring");
 const app = (0, express_1.default)();
 const port = 3000;
 app.use((0, cors_1.default)()); // include before other routes
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
     res.json({ result: true });
 });
-app.post('/project-setup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('req.body', req.body);
+app.post("/project-setup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("req.body", req.body);
     const template = req.body.selectedTemplate;
     const fetTech = req.body.fetTech;
     yield (0, index_1.createprojectStructure)(fetTech).subscribe((result) => __awaiter(void 0, void 0, void 0, function* () {
         if (result) {
             // return res.contentType('application/json').jsonp({ result: true });
-            if (fetTech === 'Angular') {
+            if (fetTech === "Angular") {
                 const responseModuleCreate = yield (0, module_creation_1.createEntireCode)(fetTech, template, req.body.component);
                 responseModuleCreate.subscribe((eleModCreate) => {
                     if (res.headersSent !== true) {
                         return res
-                            .contentType('application/json')
+                            .contentType("application/json")
                             .jsonp({ result: eleModCreate });
                     }
                 });
             }
-            else if (fetTech === 'React') {
+            else if (fetTech === "React") {
                 // React related code need to be done here.
             }
         }
         else
-            res.send('installed API Failed');
+            res.send("installed API Failed");
     }));
 }));
-app.post('/api-code-add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('req.body', req.body);
-    if (req.body.backTech === 'NodeJs') {
+app.post("/api-code-add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("req.body", req.body);
+    const createDir = req.body.backTech === "NodeJs"
+        ? constants_1.dir + "/" + constants_1.nodeDir
+        : constants_1.dir + "/" + constants_1.pythonDir;
+    if (!fs_1.default.existsSync(createDir)) {
+        fs_1.default.mkdirSync(createDir, { recursive: true });
+    }
+    if (req.body.backTech === "NodeJs") {
         const responseSetApi = yield (0, api_setting_1.setApi)(req.body.component);
         responseSetApi.subscribe((eleModCreate) => {
             if (res.headersSent !== true) {
                 return res
-                    .contentType('application/json')
+                    .contentType("application/json")
                     .jsonp({ result: eleModCreate });
             }
         });
     }
     else {
         // Python code need to be added here.
+        const responseSetPythonApi = yield (0, api_setting_2.setPythonApi)(req.body.component);
+        responseSetPythonApi.subscribe((eleModCreate) => {
+            if (res.headersSent !== true) {
+                return res
+                    .contentType("application/json")
+                    .jsonp({ result: eleModCreate });
+            }
+        });
     }
 }));
-app.post('/api-generate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('post_data', req.body);
+app.post("/api-generate", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("post_data", req.body);
     let request = yield http_1.default.request({
-        host: 'localhost',
+        host: "localhost",
         port: 3000,
-        path: '/api-code-add',
-        method: 'POST',
+        path: "/api-code-add",
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             // headers such as "Cookie" can be extracted from req object and sent to /test
         },
     }, function (response) {
-        var data = '';
-        response.setEncoding('utf8');
-        response.on('data', (chunk) => {
+        var data = "";
+        response.setEncoding("utf8");
+        response.on("data", (chunk) => {
             data += chunk;
         });
-        response.on('end', () => {
-            res.end('check result: ' + data);
+        response.on("end", () => {
+            res.end("check result: " + data);
         });
     });
     request.write(JSON.stringify(req.body));
     request.end();
 }));
-app.get('/mysql-connect-api', (req, res) => {
+app.get("/mysql-connect-api", (req, res) => {
     const fields = [
         {
-            fieldName: 'userName',
-            fieldLabel: 'User Name',
-            fieldNameBackend: 'userName',
-            lengthOfField: '100',
-            typeOfField: 'text',
-            validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
+            fieldName: "userName",
+            fieldLabel: "User Name",
+            fieldNameBackend: "userName",
+            lengthOfField: "100",
+            typeOfField: "text",
+            validation: ["required", "spacesNotAllowed", "maxLength(100)"],
         },
         {
-            fieldName: 'password',
-            fieldLabel: 'password',
-            fieldNameBackend: 'password',
-            lengthOfField: '100',
-            typeOfField: 'password',
-            validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
+            fieldName: "password",
+            fieldLabel: "password",
+            fieldNameBackend: "password",
+            lengthOfField: "100",
+            typeOfField: "password",
+            validation: ["required", "spacesNotAllowed", "maxLength(100)"],
         },
         {
-            fieldName: 'confirmPassword',
-            fieldLabel: 'Confirm Password',
-            fieldNameBackend: 'confirmPassword',
-            lengthOfField: '100',
-            typeOfField: 'password',
-            validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
+            fieldName: "confirmPassword",
+            fieldLabel: "Confirm Password",
+            fieldNameBackend: "confirmPassword",
+            lengthOfField: "100",
+            typeOfField: "password",
+            validation: ["required", "spacesNotAllowed", "maxLength(100)"],
         },
         {
-            fieldName: 'firstName',
-            fieldLabel: 'First Name',
-            fieldNameBackend: 'firstName',
-            lengthOfField: '100',
-            typeOfField: 'text',
-            validation: ['required', 'spacesNotAllowed', 'maxLength(100)'],
+            fieldName: "firstName",
+            fieldLabel: "First Name",
+            fieldNameBackend: "firstName",
+            lengthOfField: "100",
+            typeOfField: "text",
+            validation: ["required", "spacesNotAllowed", "maxLength(100)"],
         },
     ];
-    (0, db_table_generation_1.dbOprations)('dynamo', 'register', fields).subscribe((response) => {
+    (0, db_table_generation_1.dbOprations)("dynamo", "register", fields).subscribe((response) => {
         if (response) {
-            res.send('Successdully connected to db');
+            res.send("Successdully connected to db");
         }
     });
     // res.send('Loading ....');

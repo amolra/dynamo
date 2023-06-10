@@ -12,7 +12,7 @@ function createFolders(fetTech) {
     const subToReturn = new rxjs_1.BehaviorSubject(false);
     const fs = require('fs');
     const dirCode = fetTech === 'Angular' ? constants_1.angularDir : constants_1.reactDir;
-    let childDirectories = [constants_1.dir + '/' + dirCode, constants_1.dir + '/' + constants_1.nodeDir];
+    let childDirectories = [constants_1.dir + '/' + dirCode];
     let i = 0;
     childDirectories.forEach((directory) => {
         if (!fs.existsSync(directory)) {
