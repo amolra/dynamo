@@ -1,0 +1,41 @@
+import React, { useState, useEffect } from 'react';
+import grapesjs from 'grapesjs';
+import gjsPresetNewsletter from 'grapesjs-preset-newsletter';
+import ckeditor from 'grapesjs-plugin-ckeditor';
+import customCode from 'grapesjs-custom-code';
+import tuiEditor from 'grapesjs-tui-image-editor';
+import blocks from 'grapesjs-blocks-basic';
+import forms from 'grapesjs-plugin-forms';
+import './App.css';
+
+function App() {
+  const [editor,setEditor]=useState(null);
+  useEffect(()=>{
+    const editor = grapesjs.init({
+      container:'#editor',
+      plugins:[gjsPresetNewsletter,ckeditor,customCode,tuiEditor,blocks,forms],
+      pluginsOpts:{
+        gjsPresetNewsletter:{},
+        ckeditor:{},
+        customCode:{},
+        tuiEditor:{
+          config:{
+            includeUI:{
+              initMenu:'filter',
+            }
+          }
+        },
+        blocks:{},
+        forms:{}
+      }
+    });
+    setEditor(editor);
+  },[])
+  return (
+    <div className="App">
+      <div id='editor'></div>
+    </div>
+  );
+}
+
+export default App;
