@@ -1,0 +1,124 @@
+import React, { useState, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import "./index.css";
+
+let speech: SpeechRecognition | null;
+if (window.webkitSpeechRecognition) {
+  // eslint-disable-next-line
+  const SpeechRecognition = window.webkitSpeechRecognition;
+  speech = new SpeechRecognition();
+  speech.continuous = true;
+  speech.lang = "en-IN"; // Set the language to "en-IN" for Indian English accent
+  speech.interimResults = false;
+  speech.maxAlternatives = 1;
+} else {
+  speech = null;
+}
+
+const App = () => {
+  const [isListening, setIsListening] = useState(false);
+  const { register, handleSubmit } = useForm();
+  const transcriptRef = useRef("");
+  const inputRefs = useRef<{ [key: string]: HTMLInputElement | HTMLTextAreaElement | null }>({
+    name: null,
+    message: null,
+  });
+
+  const handleFieldActivation = (fieldName: string) => {
+    const inputRef = inputRefs.current[fieldName];
+    if (inputRef) {
+      inputRef.focus();
+    }
+  };
+
+  const handleSpeechRecognition = (transcript: string) => {
+    transcriptRef.current = transcript.toLowerCase();
+
+    if (transcriptRef.current.includes("name")) {
+      handleFieldActivation("name");
+      const value = transcriptRef.current.replace(`my name is`, "").trim();
+      inputRefs.current.name!.value = value;
+      transcriptRef.current = "";
+    } else if (transcriptRef.current.includes("message")) {
+      handleFieldActivation("message");
+      const value = transcriptRef.current.replace("my message is", "").trim();
+      inputRefs.current.message!.value = value;
+      transcriptRef.current = "";
+    }
+  };
+
+  const listen = () => {
+    setIsListening(!isListening);
+  };
+
+  useEffect(() => {
+    if (!speech) {
+      return;
+    }
+
+    if (isListening) {
+      speech.start();
+    } else {
+      speech.stop();
+    }
+
+    speech.onstart = () => {
+      console.log("Speech recognition started");
+    };
+
+    speech.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[event.results.length - 1][0].transcript;
+      handleSpeechRecognition(transcript);
+    };
+
+    return () => {
+      speech?.stop();
+    };
+  }, [isListening]);
+
+  const handleFormSubmit = (data: { [key: string]: string }) => {
+    console.log("Form Data:", data);
+    // Perform your desired action with the form data
+  };
+
+  return (
+    <>
+      <div className="app">
+        <h2>Voice Search</h2>
+        <div onClick={listen}>
+          Click here {isListening ? "to stop listening" : "to start listening"}
+        </div>
+        <p>{transcriptRef.current}</p>
+
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
+          <div>
+            <label htmlFor="nameInput">Name:</label>
+            <input
+              type="text"
+              id="nameInput"
+              {...register("name")}
+              ref={(ref) => {
+                inputRefs.current.name = ref;
+              }}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="messageInput">Message:</label>
+            <textarea
+              id="messageInput"
+              {...register("message")}
+              ref={(ref) => {
+                inputRefs.current.message = ref;
+              }}
+            />
+          </div>
+
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </>
+  );
+};
+
+export default App;
