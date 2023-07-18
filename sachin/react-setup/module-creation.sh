@@ -6,3 +6,4 @@ echo "$3"
 mkdir "src/$2"
 mkdir "src/$2/$3"
 echo "Module structure generated successfully!"
+

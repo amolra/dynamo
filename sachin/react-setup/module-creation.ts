@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { createModules } from '../angular-setup/index'
+import { createModules } from './index';
 import { requestFields, fields } from '../interfaces/fields';
+import { generateCodeForReact } from './generatecode/generatecode';
 import fs from 'fs';
 import path from 'path';
 import { reactDirPathForDownload } from '../constants';
@@ -21,7 +22,7 @@ export function createEntireReactCode(
     componentName: string,
     tableName: string,
     serviceMethodName: string,
-  typeOfOpration:string
+    typeOfOpration: string
   ): string => {
     const componentNametoPass = capatalizeFirstLetterOfString(componentName);
 
@@ -31,9 +32,8 @@ export function createEntireReactCode(
     };
 
     const generateInterfaceCode = generateInterface(fields);
-    let componentContent='';
-    if(typeOfOpration==='Insert')
-    {
+    let componentContent = '';
+    if (typeOfOpration === 'Insert') {
       componentContent = `
       import React, { useState, useEffect } from 'react';
       import { useForm } from 'react-hook-form';
@@ -54,8 +54,8 @@ export function createEntireReactCode(
           <div>
             <form onSubmit={handleSubmit(postData)}>
             ${fields.map((field) => {
-              const { fieldName, fieldLabel,typeOfField } = field;
-             return `
+        const { fieldName, fieldLabel, typeOfField } = field;
+        return `
                 <div key="${fieldName}">
                  <TextField
                     label="${fieldLabel}"
@@ -68,7 +68,7 @@ export function createEntireReactCode(
                  />
                 </div>
               `;
-            }).join('')}
+      }).join('')}
             <Button variant="outlined" type="submit">Submit</Button>
             </form>  
           </div>
@@ -79,7 +79,7 @@ export function createEntireReactCode(
     `;
 
     }
-    else{
+    else {
       componentContent = `
       import React, { useState, useEffect } from 'react';
       import { useForm } from 'react-hook-form';
@@ -109,24 +109,24 @@ export function createEntireReactCode(
               <TableHead>
                 <TableRow>
                   ${fields
-                    .map(
-                      (field) => `
+          .map(
+            (field) => `
                         <TableCell key="${field.fieldName}">${field.fieldLabel}</TableCell>
                       `
-                    )
-                    .join('')}
+          )
+          .join('')}
                 </TableRow>
               </TableHead>
               <TableBody>
                 { data && data.map((item) => (
                   <TableRow key={item.id}>
                     ${fields
-                      .map(
-                        (field) => `
+          .map(
+            (field) => `
                           <TableCell key={${field.fieldName}}>{item.${field.fieldName}}</TableCell>
                         `
-                      )
-                      .join('')}
+          )
+          .join('')}
                   </TableRow>
                 ))}
               </TableBody>
@@ -138,7 +138,9 @@ export function createEntireReactCode(
       export default ${componentNametoPass};
     `;
     }
-    
+
+
+
     return componentContent;
   };
 
@@ -165,7 +167,7 @@ export function createEntireReactCode(
         console.log(`Component file created successfully: ${filePath}`);
         subToReturn.next(true);
       }
-    
+
     });
 
     return subToReturn.asObservable();
@@ -181,20 +183,30 @@ export function createEntireReactCode(
 
     const filePath = `${reactDirPathForDownload}/App.tsx`;
     const data = fs.readFileSync(filePath).toString().split('\n');
-    const importStatement = "import React from 'react';\nimport { BrowserRouter as Router, Routes, Route } from 'react-router-dom';";
+    let importStatement = "import React,{ useState } from 'react';\nimport { BrowserRouter as Router, Switch, Route } from 'react-router-dom';";
     const importStatements = data.filter((ele) => ele.includes('import {'));//all import statements
     const insertIndexForImport = data.findIndex((ele) => ele.includes('import {'));//find 1st index of insert statements
+
+    for (let i = 0; i < componentNametoPassArr.length; i++) {
+      importStatement += `import ${componentNametoPassArr[i]} from './${parentModuleNametoPassArr[i]}/${newModuleNametoPassArr[i]}/${componentNametoPassArr[i]}';`;
+
+    }
     data.splice(insertIndexForImport, importStatements.length, importStatement);//replace all import with our statement
+
     // Find the index of the last import statement
     const lastIndex = data.findIndex((ele) => ele.includes('import {'));
     const insertIndex = lastIndex !== -1 ? lastIndex + 1 : 0;
 
     // Add the import statements after the last import
-    for (let i = 0; i < componentNametoPassArr.length; i++) {
-      const importStatement = `import ${componentNametoPassArr[i]} from './${parentModuleNametoPassArr[i]}/${newModuleNametoPassArr[i]}/${componentNametoPassArr[i]}';`;
-      data.splice(insertIndex, 0, importStatement);
-    }
 
+    // Generate the component JSX elements
+    let componentElements = `
+                         <Router>
+                            <Switch>
+                                   ${componentNametoPassArr.map((componentName) => `<Route path="/${componentName}" component={${componentName}} />`).join('\n')}
+                           </Switch>
+                        </Router>
+`;
     // Find the index of the return statement
     const returnIndex = data.findIndex((ele) => ele.trim() === '<>');
 
@@ -204,13 +216,7 @@ export function createEntireReactCode(
       const closingTagIndex = data.findIndex(
         (ele, index) => index > returnIndex && ele.trim() === '</>'
       );
-
-      // Generate the component JSX elements
-      const componentElements = componentNametoPassArr
-        .map((componentName) => `<${componentName} />`)
-        .join('\n');
-
-      // Replace the existing JSX content with the component elements
+    // Replace the existing JSX content with the component elements
       data.splice(returnIndex + 1, closingTagIndex - returnIndex - 1, componentElements);
     } else {
       console.error('Return statement not found in App.tsx');
@@ -219,7 +225,7 @@ export function createEntireReactCode(
     const updatedContent = data.join('\n');
     fs.writeFileSync(filePath, updatedContent, { encoding: 'utf-8' });
     subToReturn.next(true);
-    
+
     return subToReturn.asObservable();
   };
 
@@ -257,7 +263,7 @@ export function createEntireReactCode(
           throw new Error('Incomplete component information');
         }
 
-        const componentContent = generateComponentFileContent(fields, componentName, tableName, serviceMethodName,typeOfOpration);
+        const componentContent = generateComponentFileContent(fields, componentName, tableName, serviceMethodName, typeOfOpration);
         const createComponentFileObservable = createComponentFile(
           componentContent,
           parentModuleName,
@@ -270,11 +276,11 @@ export function createEntireReactCode(
             console.log(`Component file created for ${componentName}`);
             if (element === components[components.length - 1]) {
               createComponentFilesObservable.next(true);
-             
+
             }
           } else {
             createComponentFilesObservable.next(false);
-            
+
           }
         });
       }
@@ -283,16 +289,16 @@ export function createEntireReactCode(
         updateAppFile(components).subscribe((resultEditAppFile: boolean) => {
           if (resultEditAppFile) {
             subToReturn.next(true);
-           
+
           } else {
             subToReturn.next(false);
-            
+
           }
         });
       });
-   
+
     }
- 
+
   });
   subToReturn.next(true);
   return subToReturn.asObservable();
