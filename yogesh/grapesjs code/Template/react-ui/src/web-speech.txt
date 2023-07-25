@@ -1,0 +1,48 @@
+import React, { useState, useEffect } from "react";
+import "./index.css";
+
+let speech: SpeechRecognition | null;
+if (window.webkitSpeechRecognition) {
+  // eslint-disable-next-line
+  const SpeechRecognition = webkitSpeechRecognition;
+  speech = new SpeechRecognition();
+  speech.continuous = true;
+} else {
+  speech = null;
+}
+
+const App = () => {
+  const [isListening, setIsListening] = useState(false);
+  const [text, setText] = useState("");
+
+  const listen = () => {
+    setIsListening(!isListening);
+    if (isListening) {
+      speech?.stop();
+    } else {
+      speech?.start();
+    }
+  };
+
+  useEffect(() => {
+    if (!speech) {
+      return;
+    }
+    console.log(speech);
+    speech.onresult = (event: SpeechRecognitionEvent) => {
+      setText(event.results[event.results.length - 1][0].transcript);
+    };
+  }, []);
+
+  return (
+    <>
+      <div className="app">
+        <h2>Voice Search</h2>
+        <div onClick={listen}>Click here</div>
+        <p>{text}</p>
+      </div>
+    </>
+  );
+};
+
+export default App;

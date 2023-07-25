@@ -1,0 +1,138 @@
+import { useEffect, useRef, useState } from "react";
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
+
+function App() {
+  const { transcript, resetTranscript } = useSpeechRecognition();
+  const [isListening, setIsListening] = useState(false);
+  const microphoneRef = useRef<HTMLDivElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
+  const categoryInputRef = useRef<HTMLSelectElement>(null);
+  useEffect(() => {
+    // if (transcript) {
+      
+      handleRecognitionResult();
+    //  }
+  }, [transcript]);
+  const handleRecognitionResult = () => {
+    const lowerCaseTranscript = transcript.toLowerCase();
+
+    // Logic to identify the active field and perform actions accordingly
+    if (lowerCaseTranscript.includes("name")) {
+      nameInputRef.current?.focus();
+      if (nameInputRef.current) {
+        nameInputRef.current.value = lowerCaseTranscript.replace("name", "").trim();
+        
+      }
+    } else if (lowerCaseTranscript.includes("message")) {
+      messageInputRef.current?.focus();
+      if (messageInputRef.current) {
+        messageInputRef.current.value = lowerCaseTranscript.replace("message", "").trim();
+      }
+    } else if (lowerCaseTranscript.includes("category")) {
+      categoryInputRef.current?.focus();
+      if (categoryInputRef.current) {
+        categoryInputRef.current.value = lowerCaseTranscript.replace("category", "").trim();
+      }
+    }
+  };
+  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+    return (
+      <div className="microphone-container">
+        Browser does not support Speech Recognition.
+      </div>
+    );
+  }
+
+
+  
+
+
+  const handleListening = () => {
+    setIsListening(true);
+    SpeechRecognition.startListening({
+      continuous: true,
+      language: "en-IN",
+    });
+    // handleRecognitionResult();
+  };
+
+  const stopListening = () => {
+    setIsListening(false);
+    SpeechRecognition.stopListening();
+  };
+
+  const handleReset = () => {
+    stopListening();
+    resetTranscript();
+  };
+
+
+
+
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const name = nameInputRef.current?.value ?? "";
+    const message = messageInputRef.current?.value ?? "";
+    const category = categoryInputRef.current?.value ?? "";
+
+    console.log("Name:", name);
+    console.log("Message:", message);
+    console.log("Category:", category);
+
+    // Perform your desired action with the form values
+  };
+
+  return (
+    <div className="microphone-wrapper">
+      <div className="microphone-container">
+        <div
+          className="microphone-icon-container"
+          ref={microphoneRef}
+          onClick={handleListening}
+        >
+          Click Here to start listening
+        </div>
+        <div className="microphone-status">
+          {isListening ? "Listening........." : "Click to start Listening"}
+        </div>
+        {isListening && (
+          <button className="microphone-stop btn" onClick={stopListening}>
+            Stop
+          </button>
+        )}
+      </div>
+      {transcript && (
+        <div className="microphone-result-container">
+          <div className="microphone-result-text">{transcript}</div>
+          <button className="microphone-reset btn" onClick={handleReset}>
+            Reset
+          </button>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="nameInput">Name:</label>
+          <input type="text" id="nameInput" ref={nameInputRef} />
+        </div>
+        <div>
+          <label htmlFor="messageInput">Message:</label>
+          <textarea id="messageInput" ref={messageInputRef} />
+        </div>
+        <div>
+          <label htmlFor="categoryInput">Category:</label>
+          <select id="categoryInput" ref={categoryInputRef}>
+            <option value="option1">Option 1</option>
+            <option value="option2">Option 2</option>
+            <option value="option3">Option 3</option>
+          </select>
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
+}
+
+export default App;

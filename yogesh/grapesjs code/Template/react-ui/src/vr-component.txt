@@ -1,0 +1,239 @@
+import React, { useRef, useEffect, useState } from 'react';
+import './App.css';
+let speech: SpeechRecognition | null;
+if (window.webkitSpeechRecognition) {
+  // eslint-disable-next-line
+  const SpeechRecognition = window.webkitSpeechRecognition;
+  speech = new SpeechRecognition();
+  speech.continuous = true;
+  speech.lang = "en-IN"; // Set the language to "en-IN" for Indian English accent
+  speech.interimResults = false;
+  speech.maxAlternatives = 1;
+} else {
+  speech = null;
+}
+const App: React.FC = () => {
+  const frontendDropdownRef = useRef<HTMLSelectElement>(null);
+  const backendDropdownRef = useRef<HTMLSelectElement>(null);
+  const [recognizedValue, setRecognizedValue] = useState('');
+  const [isListening, setIsListening] = useState(false);
+
+  const [showComponent, setShowComponent] = useState(false);
+  const [showField, setShowField] = useState(false);
+  const transcriptRef = useRef("");
+  const frontendDropdown = document.getElementById('frontendDropdown');
+  const backendDropdown = document.getElementById('backendDropdown');
+
+  const parentModuleNameRef = useRef<HTMLInputElement>(null);
+  const newModuleNameRef = useRef<HTMLInputElement>(null);
+  const componentNameRef = useRef<HTMLInputElement>(null);
+  const serviceMethodNameRef = useRef<HTMLInputElement>(null);
+  const typeOfOperationRef = useRef<HTMLSelectElement>(null);
+  const tableNameRef = useRef<HTMLInputElement>(null);
+  const tableNameForTransactionRef = useRef<HTMLInputElement>(null);
+  const fetTechnology = [
+    { id: 1, name: 'Angular' },
+    { id: 2, name: 'React' },
+    { id: 3, name: 'ViewJs' },
+  ];
+
+  const backendTechnology = [
+    { id: 0, name: 'NodeJs' },
+    { id: 1, name: '.Net' },
+    { id: 2, name: 'Java' },
+    { id: 3, name: 'PHP' },
+    { id: 4, name: 'Python' },
+  ];
+  const types = [
+    { id: 1, name: 'Add' },
+    { id: 2, name: 'List' },
+    { id: 3, name: 'Insert' },
+  ];
+  useEffect(() => {
+    listen();
+  }, []);
+
+  const handleSpeechRecognition = (transcript: string) => {
+    transcriptRef.current = transcript.toLowerCase();
+    console.log(transcriptRef.current);
+    if (transcriptRef.current.includes('backend') || transcriptRef.current.includes('back end')) {
+      if (backendDropdownRef.current) {
+        backendDropdownRef.current.focus();
+        if (backendDropdown) {
+          backendDropdown.setAttribute('size', '5'); // make its size large so that it can extend
+        }
+        console.log(backendDropdownRef.current.value);
+      }
+
+      transcriptRef.current = '';
+    } else if (transcriptRef.current.includes('frontend') || transcriptRef.current.includes('front end')) {
+      if (frontendDropdownRef.current) {
+        frontendDropdownRef.current.focus();
+        if (frontendDropdown) {
+          frontendDropdown.setAttribute('size', '3'); // make its size large so that it can extend
+        }
+      }
+      transcriptRef.current = '';
+    }
+
+    else if (transcriptRef.current.includes('node') || transcriptRef.current.includes('nodejs') || transcriptRef.current.includes('node js') || transcriptRef.current.includes('n o d e')) {
+      console.log("recognized node");
+      console.log(backendDropdownRef.current);
+      if (backendDropdownRef.current) {
+        backendDropdownRef.current.value = 'NodeJs';
+        if (backendDropdown) {
+          backendDropdown.setAttribute('size', '1');
+        }
+
+        transcriptRef.current = '';
+      }
+    }
+    else if (transcriptRef.current.includes('python')) {
+
+      if (backendDropdownRef.current) {
+        backendDropdownRef.current.value = 'Python';
+        if (backendDropdown) {
+          backendDropdown.setAttribute('size', '1');
+        }
+
+        transcriptRef.current = '';
+      }
+    }
+    else if (transcriptRef.current.includes('angular')) {
+
+      if (frontendDropdownRef.current) {
+        frontendDropdownRef.current.value = 'Angular';
+        if (frontendDropdown) {
+          frontendDropdown.setAttribute('size', '1');
+        }
+
+        transcriptRef.current = '';
+      }
+    }
+    else if (transcriptRef.current.includes('react')) {
+
+      if (frontendDropdownRef.current) {
+        frontendDropdownRef.current.value = 'React';
+        if (frontendDropdown) {
+          frontendDropdown.setAttribute('size', '1');
+        }
+        transcriptRef.current = '';
+      }
+    }
+    else if (transcriptRef.current.includes('add component')) {
+     setShowComponent(true);
+     transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('delete component')) {
+      setShowComponent(false);
+      transcriptRef.current = '';
+     }
+  };
+
+  const listen = () => {
+    setIsListening(!isListening);
+  };
+
+  useEffect(() => {
+    if (!speech) {
+      return;
+    }
+
+    if (isListening) {
+      speech.start();
+    } else {
+      speech.stop();
+    }
+
+    speech.onstart = () => {
+      console.log("Speech recognition started");
+    };
+
+    speech.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[event.results.length - 1][0].transcript;
+      handleSpeechRecognition(transcript);
+    };
+
+    return () => {
+      speech?.stop();
+    };
+  }, [isListening]);
+
+  return (
+    <>
+      <div className="row header-form">
+        <div className="col-6">
+          <label htmlFor="frontendDropdown">Frontend Technology</label>
+          <select id="frontendDropdown" ref={frontendDropdownRef}>
+            {fetTechnology.map((tech) => (
+              <option key={tech.id} value={tech.name}>
+                {tech.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="col-6">
+          <label htmlFor="backendDropdown">Backend Technology</label>
+          <select id="backendDropdown" ref={backendDropdownRef}>
+            {backendTechnology.map((tech) => (
+              <option key={tech.id} value={tech.name}>
+                {tech.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+      </div>
+      {showComponent && (
+        <div>
+        <div className="row">
+      <div className="col-3">
+        <label htmlFor="parentModuleName">Parent Module Name</label>
+        <input type="name" id="parentModuleName" ref={parentModuleNameRef} />
+      </div>
+      <div className="col-3">
+        <label htmlFor="newModuleName">Module Name</label>
+        <input type="name" id="newModuleName" ref={newModuleNameRef} />
+      </div>
+      <div className="col-3">
+        <label htmlFor="componentName">Component Name</label>
+        <input type="name" id="componentName" ref={componentNameRef} />
+      </div>
+      <div className="col-3">
+        <label htmlFor="serviceMethodName">Service Method Name</label>
+        <input type="name" id="serviceMethodName" ref={serviceMethodNameRef} />
+      </div>
+    </div>
+    <div className="row">
+      <div className="col-3">
+        <label htmlFor="typeOfOperation">Type Of Operation</label>
+        <select id="typeOfOperation" ref={typeOfOperationRef}>
+          {types.map((type) => (
+            <option key={type.id} value={type.name}>
+              {type.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="col-3">
+        <label htmlFor="tableName">Table Name</label>
+        <input type="name" id="tableName" ref={tableNameRef} />
+      </div>
+      <div className="col-3">
+        <label htmlFor="tableNameForTransaction">Table Name For Transaction</label>
+        <input type="name" id="tableNameForTransaction" ref={tableNameForTransactionRef} />
+      </div>
+    </div>
+          <button>Delete Component</button>
+        </div>
+      )}
+  <button>Add Component</button>
+    </>
+
+
+  );
+};
+
+
+
+export default App;

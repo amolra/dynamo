@@ -1,0 +1,42 @@
+import React from 'react';
+import { useForm } from 'react-hook-form';
+
+const DynamicForm: React.FC = () => {
+  const { register, handleSubmit, control } = useForm();
+  const [fields, setFields] = React.useState<string[]>([]);
+
+  const addField = () => {
+    setFields([...fields, `field${fields.length + 1}`]);
+  };
+
+  const removeField = (index: number) => {
+    const updatedFields = [...fields];
+    updatedFields.splice(index, 1);
+    setFields(updatedFields);
+  };
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+  };
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {fields.map((field, index) => (
+          <div key={field}>
+            <input {...register(field)} />
+            <button type="button" onClick={() => removeField(index)}>
+              Remove Field
+            </button>
+          </div>
+        ))}
+        <button type="button" onClick={addField}>
+          Add Field
+        </button>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
+};
+
+export default DynamicForm;
