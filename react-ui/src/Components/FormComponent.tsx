@@ -511,7 +511,6 @@ const FormComponent: React.FC = () => {
   //handling form submit
   const handleFormSubmit = (data: any) => {
     console.log(data);
-    
     //converting to required format
     const objSent = {
       fetTech:
@@ -523,7 +522,7 @@ const FormComponent: React.FC = () => {
           ? "NodeJs"
           : data.backendTechnology,
       component:data.dynamicComponents,
-      selectedTemplate: data.selectedTemplate,
+      selectedTemplate: templateDirectoryName,
     };
     console.log(objSent);
 
@@ -560,7 +559,8 @@ const FormComponent: React.FC = () => {
           setLoading(false);
           toast.success(`template files addition done in frontend.`);
           console.log("Result", response.data);
-          reactTemplateCode();
+          generateModuleComponent(objSent);
+          
         })
         .catch((error) => {
           setLoading(false); 
@@ -574,9 +574,15 @@ const FormComponent: React.FC = () => {
         .post("http://localhost:3000/api-generate", moduleObj)
         .then((response) => {
           setLoading(false);
+          if(response.data.result) {
           toast.success(
             `${moduleObj.backTech} project structure creation for backend done.`
           );
+        } else {
+          toast.success(
+            `${moduleObj.backTech} project structure already created.`
+          );
+        }
           console.log("Result", response.data);
          
         
@@ -598,7 +604,10 @@ const FormComponent: React.FC = () => {
           );
           console.log("Result", response.data);
              //call post api to replace index.html and index.css content with tempalte generated code
-             makeTemplateCodeGenealize();
+            if(objSent.fetTech ==="React")
+             reactTemplateCode();
+             else 
+             generateAPICode(objSent);
         
         })
         .catch((error) => {
@@ -607,8 +616,8 @@ const FormComponent: React.FC = () => {
           console.error(error);
         });
     };
-  
-    generateModuleComponent(objSent);
+    makeTemplateCodeGenealize();
+    
    // generateAPICode(objSent);
   };
   const [loading, setLoading] = useState(false);

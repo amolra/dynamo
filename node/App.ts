@@ -87,11 +87,14 @@ app.post('/api-template-generation', async (req, res) => {
       req.body.cssContent,
       req.body.templateDirectoryName
     );
-    responseSetApi.subscribe((eleModCreate: boolean) => {
-      if (res.headersSent !== true) {
-        return res
-          .contentType('application/json')
-          .jsonp({ result: eleModCreate });
+    console.log('responseSetApi', responseSetApi);
+    responseSetApi.subscribe((eleModCreate: string) => {
+      console.log('eleModCreate', eleModCreate);
+      const flag = eleModCreate !== 'error';
+      if (eleModCreate !== 'NotConfirm') {
+        if (res.headersSent !== true) {
+          return res.contentType('application/json').jsonp({ result: flag });
+        }
       }
     });
   }
@@ -131,11 +134,12 @@ app.post('/api-code-add', async (req, res) => {
   console.log('req.body', req.body);
   if (req.body.backTech === 'NodeJs') {
     const responseSetApi = await setApi(req.body.component);
-    responseSetApi.subscribe((eleModCreate: boolean) => {
-      if (res.headersSent !== true) {
-        return res
-          .contentType('application/json')
-          .jsonp({ result: eleModCreate });
+    responseSetApi.subscribe((eleModCreate: string) => {
+      if (eleModCreate !== 'NotConfirm') {
+        const flag = eleModCreate !== 'error';
+        if (res.headersSent !== true) {
+          return res.contentType('application/json').jsonp({ result: flag });
+        }
       }
     });
   } else {

@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { exec } from 'shelljs';
 import process from 'process';
-import fs, { readFile, writeFile } from "fs";
+import fs, { readFile, writeFile } from 'fs';
 import {
   baseDirName,
   angularDir,
@@ -19,7 +19,7 @@ export function createFolders(fetTech: string): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
   const fs = require('fs');
   const dirCode = fetTech === 'Angular' ? angularDir : reactDir;
-  let childDirectories = [dir + '/' + dirCode];
+  let childDirectories = [basePath + baseDirName + '/' + dirCode];
   let i = 0;
   childDirectories.forEach((directory) => {
     if (!fs.existsSync(directory)) {
@@ -70,7 +70,6 @@ export function createModules(
   const subToReturn = new BehaviorSubject<boolean>(false);
   const dir = fetTech === 'Angular' ? angularDirPathForDownload : reactDir;
 
-  
   exec(
     basePath +
       projectFolder +

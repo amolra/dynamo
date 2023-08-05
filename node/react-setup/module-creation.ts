@@ -1,9 +1,9 @@
-import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { createModules } from "./index";
-import { requestFields, fields } from "../interfaces/fields";
-import fs from "fs";
-import path from "path";
-import { reactDirPathForDownload } from "../constants";
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { createModules } from './index';
+import { requestFields, fields } from '../interfaces/fields';
+import fs from 'fs';
+import path from 'path';
+import { reactDirPathForDownload } from '../constants';
 
 export function createEntireReactCode(
   fetTech: string,
@@ -29,12 +29,12 @@ export function createEntireReactCode(
       const interfaceFields = fields.map(
         ({ fieldName, typeOfField }) => `${fieldName}: ${typeOfField};`
       );
-      return `interface GeneratedInterface {\n${interfaceFields.join("\n")}\n}`;
+      return `interface GeneratedInterface {\n${interfaceFields.join('\n')}\n}`;
     };
 
     const generateInterfaceCode = generateInterface(fields);
-    let componentContent = "";
-    if (typeOfOpration === "Insert") {
+    let componentContent = '';
+    if (typeOfOpration === 'Insert') {
       componentContent = `
       import React, { useState, useEffect } from 'react';
       import { useForm } from 'react-hook-form';
@@ -71,7 +71,7 @@ export function createEntireReactCode(
                 </div>
               `;
               })
-              .join("")}
+              .join('')}
             <Button variant="outlined" type="submit">Submit</Button>
             </form>  
           </div>
@@ -80,7 +80,7 @@ export function createEntireReactCode(
 
       export default ${componentNametoPass};
     `;
-    } else if (typeOfOpration === "List") {
+    } else if (typeOfOpration === 'List') {
       componentContent = `
       import React, { useState, useEffect } from 'react';
       import { useForm } from 'react-hook-form';
@@ -115,7 +115,7 @@ export function createEntireReactCode(
                         <TableCell key="${field.fieldName}">${field.fieldLabel}</TableCell>
                       `
                     )
-                    .join("")}
+                    .join('')}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -127,7 +127,7 @@ export function createEntireReactCode(
                           <TableCell key={item.${field.fieldName}}>{item.${field.fieldName}}</TableCell>
                         `
                       )
-                      .join("")}
+                      .join('')}
                   </TableRow>
                 ))}
               </TableBody>
@@ -158,7 +158,7 @@ export function createEntireReactCode(
     // Create the directory structure if it doesn't exist
     fs.mkdirSync(dirPath, { recursive: true });
 
-    fs.writeFile(filePath, componentContent, { encoding: "utf-8" }, (error) => {
+    fs.writeFile(filePath, componentContent, { encoding: 'utf-8' }, (error) => {
       if (error) {
         console.error(`Error creating component file: ${error}`);
         subToReturn.next(false);
@@ -184,22 +184,31 @@ export function createEntireReactCode(
     );
 
     const filePath = `${reactDirPathForDownload}/App.tsx`;
-    const data = fs.readFileSync(filePath).toString().split("\n");
-    let importStatement =
-      "import React,{ useState } from 'react';\nimport { BrowserRouter as Router,Routes, Route } from 'react-router-dom'; import Routing from './Routing';\n";
-    const importStatements = data.filter((ele) => ele.includes("import {")); //all import statements
-    const insertIndexForImport = data.findIndex((ele) =>
-      ele.includes("import {")
-    ); //find 1st index of insert statements
+    const data = fs.readFileSync(filePath).toString().split('\n');
+    const checkReactIndex = data.findIndex((ele) =>
+      ele.includes("import React,{ useState } from 'react';")
+    );
+    if (checkReactIndex === -1) {
+      let importStatement = `import React,{ useState } from 'react';
+    import { BrowserRouter as Router,Routes, Route } from 'react-router-dom'; 
+    import Routing from './Routing';`;
+      const importStatements = data.filter((ele) => ele.includes('import {')); //all import statements
+      const insertIndexForImport = data.findIndex((ele) =>
+        ele.includes('import {')
+      ); //find 1st index of insert statements
 
-    for (let i = 0; i < componentNametoPassArr.length; i++) {
-      importStatement += `\nimport ${componentNametoPassArr[i]} from './${parentModuleNametoPassArr[i]}/${newModuleNametoPassArr[i]}/${componentNametoPassArr[i]}';`;
+      for (let i = 0; i < componentNametoPassArr.length; i++) {
+        importStatement += `\nimport ${componentNametoPassArr[i]} from './${parentModuleNametoPassArr[i]}/${newModuleNametoPassArr[i]}/${componentNametoPassArr[i]}';`;
+      }
+
+      data.splice(
+        insertIndexForImport,
+        importStatements.length,
+        importStatement
+      ); //replace all import with our statement
     }
-
-    data.splice(insertIndexForImport, importStatements.length, importStatement); //replace all import with our statement
-
     // Find the index of the last import statement
-    const lastIndex = data.findIndex((ele) => ele.includes("import {"));
+    const lastIndex = data.findIndex((ele) => ele.includes('import {'));
     const insertIndex = lastIndex !== -1 ? lastIndex + 1 : 0;
 
     // Add the import statements after the last import
@@ -214,18 +223,18 @@ export function createEntireReactCode(
                                        (componentName) =>
                                          `<Route path="/${componentName}" element={<${componentName}/>} />`
                                      )
-                                     .join("\n")}
+                                     .join('\n')}
                            </Routes>
                         </Router>
 `;
     // Find the index of the return statement
-    const returnIndex = data.findIndex((ele) => ele.trim() === "<>");
+    const returnIndex = data.findIndex((ele) => ele.trim() === '<>');
 
     // Check if the return statement is found
     if (returnIndex !== -1) {
       // Find the closing tag index
       const closingTagIndex = data.findIndex(
-        (ele, index) => index > returnIndex && ele.trim() === "</>"
+        (ele, index) => index > returnIndex && ele.trim() === '</>'
       );
       // Replace the existing JSX content with the component elements
       data.splice(
@@ -234,11 +243,11 @@ export function createEntireReactCode(
         componentElements
       );
     } else {
-      console.error("Return statement not found in App.tsx");
+      console.error('Return statement not found in App.tsx');
     }
 
-    const updatedContent = data.join("\n");
-    fs.writeFileSync(filePath, updatedContent, { encoding: "utf-8" });
+    const updatedContent = data.join('\n');
+    fs.writeFileSync(filePath, updatedContent, { encoding: 'utf-8' });
     subToReturn.next(true);
 
     return subToReturn.asObservable();
@@ -268,7 +277,7 @@ export function createEntireReactCode(
       <Link to="/${componentName}" style={{ textDecoration: 'none' }}>${componentName}</Link>
       </li>&nbsp;&nbsp;&nbsp;`
           )
-          .join("\n")}
+          .join('\n')}
       </ul>
     </nav>
    <Outlet />
@@ -288,7 +297,7 @@ export function createEntireReactCode(
     // Create the directory structure if it doesn't exist
     fs.mkdirSync(dirPath, { recursive: true });
 
-    fs.writeFile(filePath, routeContent, { encoding: "utf-8" }, (error) => {
+    fs.writeFile(filePath, routeContent, { encoding: 'utf-8' }, (error) => {
       if (error) {
         console.error(`Error creating component file: ${error}`);
         subToReturn.next(false);
@@ -308,7 +317,7 @@ export function createEntireReactCode(
 
   createModulesObservable.subscribe((resultcreateModules: boolean) => {
     if (resultcreateModules) {
-      console.log("Module created successfully");
+      console.log('Module created successfully');
 
       const createComponentFilesObservable = new BehaviorSubject<boolean>(
         false
@@ -337,7 +346,7 @@ export function createEntireReactCode(
           // !tableNameForTransaction ||
           // !typeOfOpration
         ) {
-          throw new Error("Incomplete component information");
+          throw new Error('Incomplete component information');
         }
 
         const componentContent = generateComponentFileContent(

@@ -275,10 +275,10 @@ export function createReactiveFormInComponentFile(
         .findIndex((ele) => ele.includes(moduleNameToInsert));
       let generateForm = `this.${componentName}Form = fb.group({`;
       fields.forEach((ele: fields) => {
-        let validateData = ``;
-        ele.validation.forEach((element: string) => {
-          validateData += `CustomValidators.${element},`;
-        });
+        const validateData = `CustomValidators.${ele.validation},`;
+        // ele.validation.forEach((element: string) => {
+        //   validateData += `CustomValidators.${ele.validation},`;
+        // });
         generateForm += `
             ${ele.fieldName}: new FormControl('', [
                 ${validateData}

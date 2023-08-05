@@ -24,7 +24,9 @@ export function editAppHtml(template: string): Observable<boolean> {
     const data = fs
       .readFileSync(templatePath + '/index.html')
       .toString()
-      .replace('%%root%%', '<router-outlet></router-outlet>');
+      .replace('%%root%%', '<router-outlet></router-outlet>')
+      .replace('<body>', '')
+      .replace('</body>', '');
     fs.writeFileSync(appHtmlFile, data, 'utf-8');
   }
   subToReturn.next(true);
@@ -113,7 +115,17 @@ export function insertAppRouting(
     const text = data.join('\n');
     console.log('text', text);
     // Display the file content
-    const dataMenu = fs.readFileSync(appHtmlFile).toString().split('\n');
+    const dataStr = fs.readFileSync(appHtmlFile).toString();
+    const dataMenu = dataStr.includes('%%menu%%')
+      ? dataStr
+          .replace(
+            '<p>%%menu%%</p>',
+            `<ul>
+      <li><a href="#">Home</a></li>
+      </ul>`
+          )
+          .split('\n')
+      : dataStr.split('\n');
     console.log('dataMenu', dataMenu);
     const lastIndexMenu = dataMenu.findIndex((ele) =>
       ele.includes(`<li><a href="#">Home</a></li>`)

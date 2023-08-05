@@ -16,16 +16,16 @@ export function createFolders(fetTech: string): Observable<boolean> {
   // const dirCode = fetTech === 'Angular' ? angularDir : reactDir;
   let childDirectories = [basePath + '/' + baseDirName + '/' + nodeDir];
   let i = 0;
-  childDirectories.forEach((directory) => {
-    if (!fs.existsSync(directory)) {
-      fs.mkdirSync(directory, { recursive: true });
-    }
-    i++;
+  if (!fs.existsSync(childDirectories[0])) {
+    fs.mkdirSync(childDirectories[0], { recursive: true });
+    subToReturn.next(true);
+  } else subToReturn.next(false);
+  // childDirectories.forEach((directory) => {
 
-    if (i === childDirectories.length) {
-      subToReturn.next(true);
-    }
-  });
+  //   if (i === childDirectories.length) {
+  //
+  //   }
+  // });
 
   return subToReturn.asObservable();
 }
@@ -301,7 +301,7 @@ export function runNodemon(): Observable<boolean> {
   return subToReturn.asObservable();
 }
 export function ApiSetting(): Observable<boolean> {
-  const subToReturn = new Subject<boolean>();
+  const subToReturn = new BehaviorSubject<boolean>(false);
   createFolders('').subscribe((res: boolean) => {
     if (res) {
       changeDir(nodeDir).subscribe((result: boolean) => {
@@ -333,7 +333,7 @@ export function ApiSetting(): Observable<boolean> {
           });
         }
       });
-    }
+    } else subToReturn.next(false);
   });
   return subToReturn.asObservable();
 }

@@ -1,8 +1,8 @@
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { ApiSetting, createIndexTs } from '.';
 import { dbOprations } from './database/db-table-generation';
-export const setApi = (components: any): Observable<boolean> => {
-  const subToReturn = new Subject<boolean>();
+export const setApi = (components: any): Observable<string> => {
+  const subToReturn = new BehaviorSubject<string>('NotConfirm');
   ApiSetting().subscribe(async (result: boolean) => {
     console.log('result', result);
 
@@ -31,19 +31,22 @@ export const setApi = (components: any): Observable<boolean> => {
                 (response: boolean) => {
                   if (response) {
                     // res.setHeader('Content-Type', 'application/json');
-                    subToReturn.next(true);
+                    subToReturn.next('Confirmed');
                     return true;
                   }
                 }
               );
             } else {
-              subToReturn.next(true);
+              subToReturn.next('Confirmed');
               return true;
             }
           }
         });
       });
-    } else subToReturn.next(false);
+    } else {
+      subToReturn.next('error');
+      // return false;
+    }
   });
   return subToReturn.asObservable();
 };
