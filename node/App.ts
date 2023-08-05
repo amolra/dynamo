@@ -41,7 +41,7 @@ app.post('/project-setup', async (req, res) => {
   //Extracting other form fields from req body
   // const component=req.body.component;
   // console.log(component);
-  
+
   await createprojectStructure(fetTech).subscribe(async (result: boolean) => {
     if (result) {
       // return res.contentType('application/json').jsonp({ result: true });
@@ -65,15 +65,14 @@ app.post('/project-setup', async (req, res) => {
           fetTech,
           template,
           req.body.component
-        )
+        );
         responseGenerateCode.subscribe((eleModCreate: boolean) => {
           if (res.headersSent !== true) {
             return res
-              .contentType("application/json")
+              .contentType('application/json')
               .jsonp({ result: eleModCreate });
           }
         });
-
       }
     } else res.send('installed API Failed');
   });
@@ -81,28 +80,36 @@ app.post('/project-setup', async (req, res) => {
 
 app.post('/api-template-generation', async (req, res) => {
   console.log('req.body', req.body);
-  if (req.body.htmlContent && req.body.cssContent ) {
-    const responseSetApi = await createTemplate(req.body.htmlContent,req.body.cssContent,req.body.templateDirectoryName);
+
+  if (req.body.htmlContent && req.body.cssContent) {
+    const responseSetApi = await createTemplate(
+      req.body.htmlContent,
+      req.body.cssContent,
+      req.body.templateDirectoryName
+    );
     responseSetApi.subscribe((eleModCreate: boolean) => {
-      if (res.headersSent !== true ) {
+      if (res.headersSent !== true) {
         return res
           .contentType('application/json')
           .jsonp({ result: eleModCreate });
       }
-    }); 
+    });
   }
 });
 app.post('/react-template-generate', async (req, res) => {
   console.log('req.body', req.body);
-  if (req.body.htmlContent && req.body.cssContent ) {
-    const responseSetApi = await createTemplateForReact(req.body.htmlContent,req.body.cssContent);
+  if (req.body.htmlContent && req.body.cssContent) {
+    const responseSetApi = await createTemplateForReact(
+      req.body.htmlContent,
+      req.body.cssContent
+    );
     responseSetApi.subscribe((eleModCreate: boolean) => {
-      if (res.headersSent !== true ) {
+      if (res.headersSent !== true) {
         return res
           .contentType('application/json')
           .jsonp({ result: eleModCreate });
       }
-    }); 
+    });
   }
 });
 // app.post('/api-template-generation', async (req, res) => {
@@ -133,7 +140,6 @@ app.post('/api-code-add', async (req, res) => {
     });
   } else {
     // Python code need to be added here.
-    
   }
 });
 

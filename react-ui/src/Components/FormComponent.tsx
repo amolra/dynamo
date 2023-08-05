@@ -548,6 +548,26 @@ const FormComponent: React.FC = () => {
           console.error(error);
         });
     };
+    const makeTemplateCodeGenealize = () => {
+      setLoading(true);
+      axios
+        .post("http://localhost:3000/api-template-generation", {
+          htmlContent,
+          cssContent,
+          templateDirectoryName
+        })
+        .then((response) => {
+          setLoading(false);
+          toast.success(`template files addition done in frontend.`);
+          console.log("Result", response.data);
+          reactTemplateCode();
+        })
+        .catch((error) => {
+          setLoading(false); 
+          toast.error("Failed to code");
+          console.error(error);
+        });
+    };
     const generateAPICode = (moduleObj: any) => {
       setLoading(true);
       axios
@@ -578,7 +598,7 @@ const FormComponent: React.FC = () => {
           );
           console.log("Result", response.data);
              //call post api to replace index.html and index.css content with tempalte generated code
-          reactTemplateCode();
+             makeTemplateCodeGenealize();
         
         })
         .catch((error) => {

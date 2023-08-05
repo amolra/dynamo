@@ -24,7 +24,7 @@ export function editAppHtml(template: string): Observable<boolean> {
     const data = fs
       .readFileSync(templatePath + '/index.html')
       .toString()
-      .replace('%internal template%', '<router-outlet></router-outlet>');
+      .replace('%%root%%', '<router-outlet></router-outlet>');
     fs.writeFileSync(appHtmlFile, data, 'utf-8');
   }
   subToReturn.next(true);

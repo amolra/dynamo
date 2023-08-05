@@ -1,4 +1,4 @@
-export const basePath = 'E:/FET_23/Dynamo_backup/integrated-code-2/integrated-code-2/';
+export const basePath = 'D:/react-dynamo/dynamo/';
 export const projectFolder = 'node';
 export const baseDirName = 'codes';
 export const dir = '../' + baseDirName;
@@ -11,11 +11,10 @@ export const angularDirPathForDownload =
 export const srcFile =
   basePath + baseDirName + '/' + angularDir + '/my-app/src';
 
-export const reactDirMyApp =  
+export const reactDirMyApp =
   basePath + baseDirName + '/' + reactDir + '/my-app/';
 
 export const reactDirPathForDownload =
   basePath + baseDirName + '/' + reactDir + '/my-app/src';
-  
-export const nodeDirMyApp =  
-  basePath + baseDirName + '/' + nodeDir;
+
+export const nodeDirMyApp = basePath + projectFolder;
