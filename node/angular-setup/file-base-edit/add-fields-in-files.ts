@@ -21,7 +21,7 @@ export function fieldHtml(
   serviceMethodName: string
 ): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
-  const appHtmlFile =
+  const appHtmlFile = 
     parentModule === 'app'
       ? angularDirPathForDownload +
         '/modules/' +

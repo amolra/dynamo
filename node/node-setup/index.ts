@@ -1,19 +1,38 @@
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { exec } from 'shelljs';
-import process from 'process';
-import fs, { readFile, writeFile } from 'fs';
+import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { exec } from "shelljs";
+import process from "process";
+import fs, { readFile, writeFile } from "fs";
 import {
   baseDirName,
   nodeDir,
   basePath,
   dir,
   projectFolder,
-} from '../constants';
-import { fields } from '../interfaces/fields';
+} from "../constants";
+import { fields } from "../interfaces/fields";
+export function createFolders(fetTech: string): Observable<boolean> {
+  const subToReturn = new BehaviorSubject<boolean>(false);
+  const fs = require("fs");
+  // const dirCode = fetTech === 'Angular' ? angularDir : reactDir;
+  let childDirectories = [dir + "/" + nodeDir];
+  let i = 0;
+  childDirectories.forEach((directory) => {
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
+    }
+    i++;
+
+    if (i === childDirectories.length) {
+      subToReturn.next(true);
+    }
+  });
+
+  return subToReturn.asObservable();
+}
 export function changeDir(dirName: string): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
-  console.log('change dir', basePath + baseDirName + '/' + dirName);
-  process.chdir(basePath + baseDirName + '/' + dirName);
+  console.log("change dir", basePath + baseDirName + "/" + dirName);
+  process.chdir(basePath + baseDirName + "/" + dirName);
   subToReturn.next(true);
   return subToReturn.asObservable();
 }
@@ -21,7 +40,7 @@ export function install(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
 
   exec(
-    basePath + projectFolder + '/node-setup/install.sh',
+    basePath + projectFolder + "/node-setup/install.sh",
     (error, stdout, stderr) => {
       if (error) {
         console.log(`error: ${error}`);
@@ -39,10 +58,10 @@ export function install(): Observable<boolean> {
 }
 export function tsEdit(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
-  const tsConfigFile = 'tsconfig.json';
+  const tsConfigFile = "tsconfig.json";
   console.log(tsConfigFile);
 
-  readFile(tsConfigFile, 'utf-8', function (err, contents) {
+  readFile(tsConfigFile, "utf-8", function (err, contents) {
     if (err) {
       console.log(err);
       //   return;
@@ -53,22 +72,22 @@ export function tsEdit(): Observable<boolean> {
       `"outDir": "./dist"`
     );
 
-    writeFile(tsConfigFile, replaced, 'utf-8', function (err) {
+    writeFile(tsConfigFile, replaced, "utf-8", function (err) {
       console.log(err);
     });
     subToReturn.next(true);
   });
 
-  console.log('write file complete');
+  console.log("write file complete");
   return subToReturn.asObservable();
 }
 export function packageEdit(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
 
-  const tsConfigFile = 'package.json';
+  const tsConfigFile = "package.json";
   console.log(tsConfigFile);
 
-  readFile(tsConfigFile, 'utf-8', function (err, contents) {
+  readFile(tsConfigFile, "utf-8", function (err, contents) {
     if (err) {
       console.log(err);
       //   return;
@@ -85,46 +104,46 @@ export function packageEdit(): Observable<boolean> {
         `
     );
 
-    writeFile(tsConfigFile, replaced, 'utf-8', function (err) {
+    writeFile(tsConfigFile, replaced, "utf-8", function (err) {
       console.log(err);
     });
 
     subToReturn.next(true);
   });
 
-  console.log('write file complete');
+  console.log("write file complete");
   return subToReturn.asObservable();
 }
 export function createMariadbConnectFile() {
   const subToReturn = new BehaviorSubject<boolean>(false);
-  if (!fs.existsSync('database')) {
-    fs.mkdirSync('database', { recursive: true });
+  if (!fs.existsSync("database")) {
+    fs.mkdirSync("database", { recursive: true });
   }
   const tsConfigFile =
-    basePath + projectFolder + '/node-setup/database/mysql-connect.ts';
-  const tsConfigFileWrite = './database/mysql-connect.ts';
-  const tsConfigFileQuery = './database/mysql-queries.ts';
+    basePath + projectFolder + "/node-setup/database/mysql-connect.ts";
+  const tsConfigFileWrite = "./database/mysql-connect.ts";
+  const tsConfigFileQuery = "./database/mysql-queries.ts";
   console.log(tsConfigFile);
   if (!fs.existsSync(tsConfigFileWrite)) {
-    fs.open(tsConfigFileWrite, 'w', function (err, file) {
+    fs.open(tsConfigFileWrite, "w", function (err, file) {
       if (err) throw err;
-      console.log('Saved!' + tsConfigFileWrite);
+      console.log("Saved!" + tsConfigFileWrite);
     });
-    readFile(tsConfigFile, 'utf-8', function (err, contents) {
+    readFile(tsConfigFile, "utf-8", function (err, contents) {
       if (err) {
         console.log(err);
         //   return;
       }
       console.log(contents);
-      writeFile(tsConfigFileWrite, contents, 'utf-8', function (err) {
+      writeFile(tsConfigFileWrite, contents, "utf-8", function (err) {
         console.log(err);
       });
     });
   }
   if (!fs.existsSync(tsConfigFileQuery)) {
-    fs.open(tsConfigFileQuery, 'w', function (err, file) {
+    fs.open(tsConfigFileQuery, "w", function (err, file) {
       if (err) throw err;
-      console.log('Saved!' + tsConfigFileQuery);
+      console.log("Saved!" + tsConfigFileQuery);
     });
 
     const contentQuery = `import { BehaviorSubject, from, Observable, Subject } from 'rxjs';
@@ -166,13 +185,13 @@ export function createMariadbConnectFile() {
     
       return subToReturn.asObservable();
     }`;
-    writeFile(tsConfigFileQuery, contentQuery, 'utf-8', function (err) {
+    writeFile(tsConfigFileQuery, contentQuery, "utf-8", function (err) {
       console.log(err);
 
       subToReturn.next(true);
     });
   }
-  console.log('write file complete');
+  console.log("write file complete");
   return subToReturn.asObservable();
 }
 export function createIndexTs(
@@ -183,7 +202,7 @@ export function createIndexTs(
   tableNameForTransaction: string
 ): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
-  const routingFile = 'index.ts';
+  const routingFile = "index.ts";
   // Need to do below things
   //1. create mariadb connect file
   //2. create query to select and insert inside of api.
@@ -191,9 +210,9 @@ export function createIndexTs(
   console.log(routingFile);
   let indexFileContent = ``;
   if (!fs.existsSync(routingFile)) {
-    fs.open(routingFile, 'w', function (err, file) {
+    fs.open(routingFile, "w", function (err, file) {
       if (err) throw err;
-      console.log('Saved!');
+      console.log("Saved!");
     });
     indexFileContent = `import express, { Express, Request, Response } from 'express';
       import cors from 'cors';
@@ -216,7 +235,7 @@ export function createIndexTs(
   }
 
   let contentApi = ``;
-  if (typeOfOpration === 'List') {
+  if (typeOfOpration === "List") {
     contentApi = ` app.get('/${serviceMethodName}', (req: Request, res: Response) => {
       console.log('receiving data ...');
       console.log('body is ',req.body);
@@ -249,15 +268,15 @@ export function createIndexTs(
     `;
   }
 
-  const data = indexFileContent.toString().split('\n');
+  const data = indexFileContent.toString().split("\n");
   const lastIndex = data
     .reverse()
-    .findIndex((ele) => ele.includes('app.listen(port, () => {'));
+    .findIndex((ele) => ele.includes("app.listen(port, () => {"));
   data.splice(lastIndex + 1, 0, `${contentApi}`);
   data.reverse();
-  const text = data.join('\n');
-  fs.writeFileSync(routingFile, text, 'utf-8');
-  console.log('write file complete');
+  const text = data.join("\n");
+  fs.writeFileSync(routingFile, text, "utf-8");
+  console.log("write file complete");
   subToReturn.next(true);
   return subToReturn.asObservable();
 }
@@ -265,7 +284,7 @@ export function runNodemon(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
 
   exec(
-    basePath + projectFolder + '/node-setup/nodemonInstall.sh',
+    basePath + projectFolder + "/node-setup/nodemonInstall.sh",
     (error, stdout, stderr) => {
       if (error) {
         console.log(`error: ${error}`);
@@ -283,27 +302,31 @@ export function runNodemon(): Observable<boolean> {
 }
 export function ApiSetting(): Observable<boolean> {
   const subToReturn = new Subject<boolean>();
-  changeDir(nodeDir).subscribe((result: boolean) => {
-    if (result) {
-      install().subscribe((resultInstall: boolean) => {
-        if (resultInstall) {
-          tsEdit().subscribe((resulttsEdit: boolean) => {
-            if (resulttsEdit) {
-              packageEdit().subscribe((resultPackageEdit: boolean) => {
-                if (resultPackageEdit) {
-                  createMariadbConnectFile().subscribe(
-                    (resultcreateIndexTs: boolean) => {
-                      if (resultcreateIndexTs) {
-                        runNodemon().subscribe(
-                          (resultcreateRunNodemon: boolean) => {
-                            if (resultcreateRunNodemon) {
-                              subToReturn.next(true);
-                            }
+  createFolders("").subscribe((res: boolean) => {
+    if (res) {
+      changeDir(nodeDir).subscribe((result: boolean) => {
+        if (result) {
+          install().subscribe((resultInstall: boolean) => {
+            if (resultInstall) {
+              tsEdit().subscribe((resulttsEdit: boolean) => {
+                if (resulttsEdit) {
+                  packageEdit().subscribe((resultPackageEdit: boolean) => {
+                    if (resultPackageEdit) {
+                      createMariadbConnectFile().subscribe(
+                        (resultcreateIndexTs: boolean) => {
+                          if (resultcreateIndexTs) {
+                            runNodemon().subscribe(
+                              (resultcreateRunNodemon: boolean) => {
+                                if (resultcreateRunNodemon) {
+                                  subToReturn.next(true);
+                                }
+                              }
+                            );
                           }
-                        );
-                      }
+                        }
+                      );
                     }
-                  );
+                  });
                 }
               });
             }
@@ -312,6 +335,5 @@ export function ApiSetting(): Observable<boolean> {
       });
     }
   });
-
   return subToReturn.asObservable();
 }

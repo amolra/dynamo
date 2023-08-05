@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { exec } from 'shelljs';
 import process from 'process';
-
+import fs, { readFile, writeFile } from "fs";
 import {
   baseDirName,
   angularDir,
@@ -11,6 +11,7 @@ import {
   nodeDir,
   angularDirPathForDownload,
   reactDir,
+  reactDirPathForDownload,
 } from '../constants';
 import { fields } from '../interfaces/fields';
 
@@ -63,23 +64,13 @@ export function install(fetTech: string): Observable<boolean> {
 }
 export function createModules(
   fetTech: string,
-  parentModule: string,
+  parentModuleName: string,
   newModule: string
 ): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
   const dir = fetTech === 'Angular' ? angularDirPathForDownload : reactDir;
-  console.log(
-    basePath +
-      projectFolder +
-      '/' +
-      fetTech.toLowerCase() +
-      '-setup/module-creation.sh ' +
-      dir +
-      ' ' +
-      parentModule +
-      ' ' +
-      newModule
-  );
+
+  
   exec(
     basePath +
       projectFolder +
@@ -88,7 +79,7 @@ export function createModules(
       '-setup/module-creation.sh ' +
       dir +
       ' ' +
-      parentModule +
+      parentModuleName +
       ' ' +
       newModule,
     (error, stdout, stderr) => {
@@ -114,20 +105,20 @@ export function createComponentService(
 ): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
   const dir = fetTech === 'Angular' ? angularDirPathForDownload : reactDir;
-  // console.log(
-  //   basePath +
-  //     projectFolder +
-  //     '/' +
-  //     fetTech.toLowerCase() +
-  //     '-setup/component-creation.sh ' +
-  //     dir +
-  //     ' ' +
-  //     parentModule +
-  //     ' ' +
-  //     newModule +
-  //     ' ' +
-  //     componentName
-  // );
+  console.log(
+    basePath +
+      projectFolder +
+      '/' +
+      fetTech.toLowerCase() +
+      '-setup/component-creation.sh ' +
+      dir +
+      ' ' +
+      parentModule +
+      ' ' +
+      newModule +
+      ' ' +
+      componentName
+  );
   exec(
     basePath +
       projectFolder +

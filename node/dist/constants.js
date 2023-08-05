@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.nodeDirMyApp = exports.reactDirPathForDownload = exports.reactDirMyApp = exports.srcFile = exports.angularDirPathForDownload = exports.nodeDir = exports.reactDir = exports.angularDir = exports.dir = exports.baseDirName = exports.projectFolder = exports.basePath = void 0;
+exports.basePath = 'E:/FET_23/Dynamo_backup/integrated-code-2/integrated-code-2/';
+exports.projectFolder = 'node';
+exports.baseDirName = 'codes';
+exports.dir = '../' + exports.baseDirName;
+exports.angularDir = 'angular-code';
+exports.reactDir = 'react-code';
+exports.nodeDir = 'nodejs-code';
+exports.angularDirPathForDownload = exports.basePath + exports.baseDirName + '/' + exports.angularDir + '/my-app/src/app';
+exports.srcFile = exports.basePath + exports.baseDirName + '/' + exports.angularDir + '/my-app/src';
+exports.reactDirMyApp = exports.basePath + exports.baseDirName + '/' + exports.reactDir + '/my-app/';
+exports.reactDirPathForDownload = exports.basePath + exports.baseDirName + '/' + exports.reactDir + '/my-app/src';
+exports.nodeDirMyApp = exports.basePath + exports.baseDirName + '/' + exports.nodeDir;

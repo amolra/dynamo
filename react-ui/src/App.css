@@ -1,0 +1,136 @@
+.form-container {
+  border: 1px solid lightgray;
+  padding: 10px;
+  width: 100%;
+  margin: 40px auto;
+  .header-form {
+    padding: 10px;
+  }
+  .component-container {
+    border: 1px solid lightgray;
+    padding: 10px;
+    margin: 15px 10px;
+    background-color: aliceblue;
+  }
+  .row {
+    margin: 10px;
+    margin-top: 12px;
+    .float-right {
+      text-align: right;
+    }
+  }
+  mat-card {
+    width: 300px;
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  mat-card-header {
+    display: flex;
+    align-items: center;
+  }
+
+  mat-card-title {
+    margin: 0;
+  }
+
+  mat-radio-button {
+    display: block;
+    margin-bottom: 10px;
+  }
+  img {
+    max-width: 230px;
+    max-height: 64px;
+    width: auto;
+    height: auto;
+  }
+}
+button{
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-block;
+  text-decoration: none;
+  color: #fff;
+  background-color: #174ea6;
+  border: 2px solid #fff;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+  font-family: "Google Sans", Arial, Helvetica, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 20px;
+  padding: 8px 15px 8px 15px;
+  text-align: center;
+  max-width: 400px;
+  margin-top: 15px;
+}
+
+/* Custom styles for select option dropdown */
+
+.custom-select {
+  position: relative;
+  display: inline-block;
+  width: 150px;
+  max-width: 200px;
+}
+
+.custom-select select {
+  width: 70%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  appearance: none;
+  background-color: white;
+  cursor: pointer;
+}
+
+ .custom-select::after {
+  content: '▾';
+  position: absolute;
+  top: 40%;
+  /* right: 10px; */
+  transform: translateX(-100%);
+  pointer-events: none;
+} 
+/* Loader Container */
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Make sure the loader is above other elements */
+  font-size: 40px;
+  color: #ffffff;
+  padding: auto;
+}
+
+
+.loader::before {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  border-top: 3px solid #3498db; /* Change the color as you like */
+  animation: spin 1s linear infinite;
+  padding-right: 2px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+

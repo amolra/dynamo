@@ -1,0 +1,395 @@
+import React, { createRef, useCallback, useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import './App.css';
+let speech: SpeechRecognition | null;
+if (window.webkitSpeechRecognition) {
+  // eslint-disable-next-line
+  const SpeechRecognition = window.webkitSpeechRecognition;
+  speech = new SpeechRecognition();
+  speech.continuous = true;
+  speech.lang = "en-IN"; // Set the language to "en-IN" for Indian English accent
+  speech.interimResults = false;
+  speech.maxAlternatives = 1;
+} else {
+  speech = null;
+}
+interface DynamicFieldProps {
+  parentModuleName: string;
+  newModuleName: string;
+  componentName: string;
+  serviceMethodName: string;
+  typeOfOperation: string;
+  tableName: string;
+  tableNameForTransaction: string;
+}
+
+const fetTechnology = [
+  { id: 1, name: 'Angular' },
+  { id: 2, name: 'React' },
+  { id: 3, name: 'ViewJs' },
+];
+
+const backendTechnology = [
+  { id: 0, name: 'NodeJs' },
+  { id: 1, name: '.Net' },
+  { id: 2, name: 'Java' },
+  { id: 3, name: 'PHP' },
+  { id: 4, name: 'Python' },
+];
+const types = [
+  { id: 1, name: 'Add' },
+  { id: 2, name: 'List' },
+  { id: 3, name: 'Insert' },
+];
+
+const App: React.FC = () => {
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+
+  const [dynamicComponents, setDynamicComponents] = useState<DynamicFieldProps[]>([]);
+  const [dynamicComponentsLength, setDynamicComponentsLength] = useState<number>(0);
+  const frontendDropdownRef = useRef<HTMLSelectElement>(null);
+  const backendDropdownRef = useRef<HTMLSelectElement>(null);
+  const [recognizedValue, setRecognizedValue] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const transcriptRef = useRef("");
+  const frontendDropdown = document.getElementById('frontendDropdown');
+  const backendDropdown = document.getElementById('backendDropdown');
+  const dropdownRefs = useRef<Array<HTMLSelectElement | null>>([]);
+  const addField = () => {
+    setDynamicComponents((prevDynamicComponents) => {
+      const newComponent: DynamicFieldProps = {
+        parentModuleName: '',
+        newModuleName: '',
+        componentName: '',
+        serviceMethodName: '',
+        typeOfOperation: '',
+        tableName: '',
+        tableNameForTransaction: '',
+      };
+
+      return [...prevDynamicComponents, newComponent];
+    });
+  };
+
+
+  const removeField = (index: number) => {
+    const updatedComponents = [...dynamicComponents];
+    updatedComponents.splice(index, 1);
+    setDynamicComponents(updatedComponents);
+  };
+
+  useEffect(() => {
+    if (!speech) {
+      return;
+    }
+
+    if (isListening) {
+      speech.start();
+    } else {
+      speech.stop();
+    }
+
+    speech.onstart = () => {
+      console.log("Speech recognition started");
+    };
+
+    speech.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[event.results.length - 1][0].transcript;
+      handleSpeechRecognition(transcript);
+    };
+
+    return () => {
+      speech?.stop();
+    };
+  }, [isListening]);
+
+  useEffect(() => {
+    console.log(dynamicComponents.length);
+    console.log(document.getElementsByClassName("dynamic-component").length)
+    setDynamicComponentsLength(dynamicComponents.length);
+  }, [dynamicComponents]);
+
+
+  const handleSpeechRecognition = useCallback((transcript: string) => {
+    transcriptRef.current = transcript.toLowerCase();
+    console.log(transcriptRef.current);
+    if (transcriptRef.current.includes('backend') || transcriptRef.current.includes('back end')) {
+      if (backendDropdownRef.current) {
+        backendDropdownRef.current.focus();
+        if (backendDropdown) {
+          backendDropdown.setAttribute('size', '5'); // make its size large so that it can extend
+        }
+        console.log(backendDropdownRef.current.value);
+      }
+
+      transcriptRef.current = '';
+    } else if (transcriptRef.current.includes('frontend') || transcriptRef.current.includes('front end')) {
+      if (frontendDropdownRef.current) {
+        frontendDropdownRef.current.focus();
+        if (frontendDropdown) {
+          frontendDropdown.setAttribute('size', '3'); // make its size large so that it can extend
+        }
+      }
+      transcriptRef.current = '';
+    }
+
+    else if (transcriptRef.current.includes('node') || transcriptRef.current.includes('nodejs') || transcriptRef.current.includes('node js') || transcriptRef.current.includes('n o d e')) {
+      console.log("recognized node");
+      console.log(backendDropdownRef.current);
+      if (backendDropdownRef.current) {
+        backendDropdownRef.current.value = 'NodeJs';
+        if (backendDropdown) {
+          backendDropdown.setAttribute('size', '1');
+        }
+
+        transcriptRef.current = '';
+      }
+    }
+    else if (transcriptRef.current.includes('python')) {
+
+      if (backendDropdownRef.current) {
+        backendDropdownRef.current.value = 'Python';
+        if (backendDropdown) {
+          backendDropdown.setAttribute('size', '1');
+        }
+
+        transcriptRef.current = '';
+      }
+    }
+    else if (transcriptRef.current.includes('angular')) {
+
+      if (frontendDropdownRef.current) {
+        frontendDropdownRef.current.value = 'Angular';
+        if (frontendDropdown) {
+          frontendDropdown.setAttribute('size', '1');
+        }
+
+        transcriptRef.current = '';
+      }
+    }
+    else if (transcriptRef.current.includes('react')) {
+
+      if (frontendDropdownRef.current) {
+        frontendDropdownRef.current.value = 'React';
+        if (frontendDropdown) {
+          frontendDropdown.setAttribute('size', '1');
+        }
+        transcriptRef.current = '';
+      }
+    }
+    else if (transcriptRef.current.includes('add component') || transcriptRef.current.includes(' add component')) {
+
+      let addComponentButtonRef = document.getElementById("addComponentButton");
+
+      // Simulate a click on the button
+      if (addComponentButtonRef) {
+        addComponentButtonRef.click();
+      }
+      console.log("called add new component method");
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('delete component')) {
+      let deleteComponentButtonRef = document.getElementById("deleteComponentButton");
+      // Simulate a click on the button
+      if (deleteComponentButtonRef) {
+        deleteComponentButtonRef.click();
+      }
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('parent module') || transcriptRef.current.includes('parent module name')) {
+      const fieldName = `dynamicComponents[${document.getElementsByClassName("dynamic-component").length - 1}].parentModuleName`;
+      console.log(fieldName);
+      const value = transcriptRef.current.replace(`parent module`, "").trim();
+      setValue(fieldName, value); // Set the value using setValue
+
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('module name')) {
+      const fieldName = `dynamicComponents[${document.getElementsByClassName("dynamic-component").length - 1}].newModuleName`;
+      console.log(fieldName);
+      const value = transcriptRef.current.replace(`module name`, "").trim();
+      setValue(fieldName, value); // Set the value using setValue
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('component name')) {
+      const fieldName = `dynamicComponents[${document.getElementsByClassName("dynamic-component").length - 1}].componentName`;
+      console.log(fieldName);
+      const value = transcriptRef.current.replace(`component name`, "").trim();
+      setValue(fieldName, value); // Set the value using setValue
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('service method name') || transcriptRef.current.includes('service method')) {
+      const fieldName = `dynamicComponents[${document.getElementsByClassName("dynamic-component").length - 1}].serviceMethodName`;
+      console.log(fieldName);
+      const value = transcriptRef.current.replace(`service method name`, "").trim();
+      setValue(fieldName, value); // Set the value using setValue
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('table name for transaction')) {
+      const fieldName = `dynamicComponents[${document.getElementsByClassName("dynamic-component").length - 1}].tableNameForTransaction`;
+      console.log(fieldName);
+      const value = transcriptRef.current.replace(`table name for transaction`, "").trim();
+      setValue(fieldName, value); // Set the value using setValue
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('table name')) {
+      const fieldName = `dynamicComponents[${document.getElementsByClassName("dynamic-component").length - 1}].tableName`;
+      console.log(fieldName);
+      const value = transcriptRef.current.replace(`table name`, "").trim();
+      setValue(fieldName, value); // Set the value using setValue
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('type of operation')) {
+      const dropdownIndex: number = document.getElementsByClassName("dynamic-component").length - 1;
+      console.log(dropdownIndex);
+      const dropdown = dropdownRefs.current[dropdownIndex];
+      console.log(dropdown);
+      if (dropdown) {
+        dropdown.focus();
+        dropdown.setAttribute('size', '4'); // make its size large to show options
+      }
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('add') ||transcriptRef.current.includes('ad') ) {
+      const dropdownIndex: number = document.getElementsByClassName("dynamic-component").length - 1;
+      const dropdown = dropdownRefs.current[dropdownIndex];
+      if (dropdown) {
+        dropdown.setAttribute('size', '1'); // make its size large to show options
+        dropdown.value="Add";
+      }
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('list')) {
+      const dropdownIndex: number = document.getElementsByClassName("dynamic-component").length - 1;
+      const dropdown = dropdownRefs.current[dropdownIndex];
+      if (dropdown) {
+        dropdown.setAttribute('size', '1'); // make its size large to show options
+        dropdown.value="List";
+      }
+      transcriptRef.current = '';
+    }
+    else if (transcriptRef.current.includes('insert')) {
+      const dropdownIndex: number = document.getElementsByClassName("dynamic-component").length - 1;
+      const dropdown = dropdownRefs.current[dropdownIndex];
+      if (dropdown) {
+        dropdown.setAttribute('size', '1'); // make its size large to show options
+        dropdown.value="Insert";
+      }
+      transcriptRef.current = '';
+    }
+
+
+
+  }, [dynamicComponents]);
+
+
+  const handleFormSubmit = (data: any) => {
+    console.log(data);
+  };
+  useEffect(() => {
+    listen();
+  }, []);
+  const listen = () => {
+    setIsListening(!isListening);
+  };
+
+
+
+
+
+
+  return (
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
+      {(dynamicComponents.map((component, index) => (
+        <div key={index} className="row dynamic-component">
+          <div className="col-3">
+            <label htmlFor={`parentModuleName-${index}`}>Parent Module Name</label>
+            <input
+              type="text"
+              id={`parentModuleName-${index}`}
+              {...register(`dynamicComponents[${index}].parentModuleName`)}
+            />
+          </div>
+          <div className="col-3">
+            <label htmlFor={`newModuleName-${index}`}>Module Name</label>
+            <input
+              type="text"
+              id={`newModuleName-${index}`}
+              {...register(`dynamicComponents[${index}].newModuleName`)}
+            />
+          </div>
+          <div className="col-3">
+            <label htmlFor={`componentName-${index}`}>Component Name</label>
+            <input
+              type="text"
+              id={`componentName-${index}`}
+              {...register(`dynamicComponents[${index}].componentName`)}
+            />
+          </div>
+          <div className="col-3">
+            <label htmlFor={`serviceMethodName-${index}`}>Service Method Name</label>
+            <input
+              type="text"
+              id={`serviceMethodName-${index}`}
+              {...register(`dynamicComponents[${index}].serviceMethodName`)}
+            />
+          </div>
+          <div className="col-3">
+            <label htmlFor={`typeOfOperation-${index}`}>Type Of Operation {index + 1}</label>
+            <select
+              id={`typeOfOperation-${index}`}
+              {...register(`dynamicComponents[${index}].typeOfOperation`)}
+              ref={(el) => (dropdownRefs.current[index] = el)}
+            >
+              {types.map((type) => (
+                <option key={type.id} value={type.name}>
+                  {type.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="col-3">
+            <label htmlFor={`tableName-${index}`}>Table Name</label>
+            <input
+              type="text"
+              id={`tableName-${index}`}
+              {...register(`dynamicComponents[${index}].tableName`)}
+            />
+          </div>
+          <div className="col-3">
+            <label htmlFor={`tableNameForTransaction-${index}`}>Table Name For Transaction</label>
+            <input
+              type="text"
+              id={`tableNameForTransaction-${index}`}
+              {...register(`dynamicComponents[${index}].tableNameForTransaction`)}
+            />
+          </div>
+        </div>
+      )))}
+
+      {/* Add or remove dynamic fields */}
+      <button type="button" id="addComponentButton" onClick={addField}>
+        Add Component
+      </button>
+
+      {dynamicComponents.length > 0 && (
+        <button type="button" id="deleteComponentButton" onClick={() => removeField(dynamicComponents.length - 1)}>
+          Delete Component
+        </button>
+      )}
+
+      {/* Submit button */}
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default App;
