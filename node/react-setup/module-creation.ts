@@ -170,8 +170,33 @@ export function createEntireReactCode(
 
     return subToReturn.asObservable();
   };
+  const updateAppFile = () => {
+    let componentElements = `
+    import './App.css'
 
-  const updateAppFile = (components: requestFields[]) => {
+import {Routing} from './Routing';
+
+function App() {
+  
+
+  return (
+    <>
+    
+    <Routing />
+    </>
+  )
+}
+
+export default App
+`;
+    const filePath = `${reactDirPathForDownload}/App.tsx`;
+    const subToReturn = new BehaviorSubject<boolean>(false);
+    fs.writeFileSync(filePath, componentElements, { encoding: 'utf-8' });
+    subToReturn.next(true);
+
+    return subToReturn.asObservable();
+  };
+  const createRouting = (components: requestFields[]) => {
     const subToReturn = new BehaviorSubject<boolean>(false);
     const componentNametoPassArr: string[] = components.map(
       (data: requestFields) => capatalizeFirstLetterOfString(data.componentName)
@@ -183,86 +208,92 @@ export function createEntireReactCode(
       (data: requestFields) => data.newModuleName
     );
 
-    const filePath = `${reactDirPathForDownload}/App.tsx`;
-    const data = fs.readFileSync(filePath).toString().split('\n');
-    const checkReactIndex = data.findIndex((ele) =>
-      ele.includes("import React,{ useState } from 'react';")
-    );
-    if (checkReactIndex === -1) {
-      let importStatement = `import React,{ useState } from 'react';
-    import { BrowserRouter as Router,Routes, Route } from 'react-router-dom'; 
-    import Routing from './Routing';`;
-      const importStatements = data.filter((ele) => ele.includes('import {')); //all import statements
-      const insertIndexForImport = data.findIndex((ele) =>
-        ele.includes('import {')
-      ); //find 1st index of insert statements
+    const filePath = `${reactDirPathForDownload}/Routing.tsx`;
+    // const data = fs.readFileSync(filePath).toString().split('\n');
+    // const checkReactIndex = data.findIndex((ele) =>
+    //   ele.includes("import React,{ useState } from 'react';")
+    // );
+    // if (checkReactIndex === -1) {
+    let importStatement = `import React,{ useState } from 'react';
+    import { BrowserRouter,Routes, Route } from 'react-router-dom'; 
+    import { Layout } from "./Layout";`;
+    // const importStatements = data.filter((ele) => ele.includes('import {')); //all import statements
+    // const insertIndexForImport = data.findIndex((ele) =>
+    //   ele.includes('import {')
+    // ); //find 1st index of insert statements
 
-      for (let i = 0; i < componentNametoPassArr.length; i++) {
-        importStatement += `\nimport ${componentNametoPassArr[i]} from './${parentModuleNametoPassArr[i]}/${newModuleNametoPassArr[i]}/${componentNametoPassArr[i]}';`;
-      }
-
-      data.splice(
-        insertIndexForImport,
-        importStatements.length,
-        importStatement
-      ); //replace all import with our statement
+    for (let i = 0; i < componentNametoPassArr.length; i++) {
+      importStatement += `\nimport ${componentNametoPassArr[i]} from './${parentModuleNametoPassArr[i]}/${newModuleNametoPassArr[i]}/${componentNametoPassArr[i]}';`;
     }
+    let componentElements =
+      importStatement +
+      `\n\nexport  const Routing = () => {
+          return (
+                  <BrowserRouter>
+                    <Routes>
+                    <Route path="/" element={<Layout />} >
+                      ${componentNametoPassArr
+                        .map(
+                          (componentName) =>
+                            `<Route path="/${componentName}" element={<${componentName}/>} />`
+                        )
+                        .join('\n')}
+                        </Route>
+                    </Routes>
+                </BrowserRouter>
+             )
+          }
+`;
+    fs.writeFileSync(filePath, componentElements, { encoding: 'utf-8' });
+    subToReturn.next(true);
+    // data.splice(
+    //   insertIndexForImport,
+    //   importStatements.length,
+    //   importStatement
+    // ); //replace all import with our statement
+    // }
     // Find the index of the last import statement
-    const lastIndex = data.findIndex((ele) => ele.includes('import {'));
-    const insertIndex = lastIndex !== -1 ? lastIndex + 1 : 0;
+    // const lastIndex = data.findIndex((ele) => ele.includes('import {'));
+    // const insertIndex = lastIndex !== -1 ? lastIndex + 1 : 0;
 
     // Add the import statements after the last import
 
     // Generate the component JSX elements
-    let componentElements = `
-                         <Router>
-                         <Routing />
-                            <Routes>
-                                   ${componentNametoPassArr
-                                     .map(
-                                       (componentName) =>
-                                         `<Route path="/${componentName}" element={<${componentName}/>} />`
-                                     )
-                                     .join('\n')}
-                           </Routes>
-                        </Router>
-`;
+
     // Find the index of the return statement
-    const returnIndex = data.findIndex((ele) => ele.trim() === '<>');
+    // const returnIndex = data.findIndex((ele) => ele.trim() === '<>');
 
     // Check if the return statement is found
-    if (returnIndex !== -1) {
-      // Find the closing tag index
-      const closingTagIndex = data.findIndex(
-        (ele, index) => index > returnIndex && ele.trim() === '</>'
-      );
-      // Replace the existing JSX content with the component elements
-      data.splice(
-        returnIndex + 1,
-        closingTagIndex - returnIndex - 1,
-        componentElements
-      );
-    } else {
-      console.error('Return statement not found in App.tsx');
-    }
+    // if (returnIndex !== -1) {
+    //   // Find the closing tag index
+    //   const closingTagIndex = data.findIndex(
+    //     (ele, index) => index > returnIndex && ele.trim() === '</>'
+    //   );
+    //   // Replace the existing JSX content with the component elements
+    //   data.splice(
+    //     returnIndex + 1,
+    //     closingTagIndex - returnIndex - 1,
+    //     componentElements
+    //   );
+    // } else {
+    //   console.error('Return statement not found in App.tsx');
+    // }
 
-    const updatedContent = data.join('\n');
-    fs.writeFileSync(filePath, updatedContent, { encoding: 'utf-8' });
-    subToReturn.next(true);
+    // const updatedContent = data.join('\n');
 
     return subToReturn.asObservable();
   };
   //route file
   //Route and Link Code
-  const generateRouteFileContent = (): string => {
+  const generateMenuFileContent = (): string => {
     const componentNametoPassArr: string[] = components.map(
       (data: requestFields) => capatalizeFirstLetterOfString(data.componentName)
     );
 
     let routeContent = `
-  import { Outlet, Link } from "react-router-dom";
+  import { Link } from "react-router-dom";
 
-  const Routing = () => {
+  export  const Menu = () => {
     return (
       <>
       <nav>
@@ -280,18 +311,18 @@ export function createEntireReactCode(
           .join('\n')}
       </ul>
     </nav>
-   <Outlet />
+   
       </>
     )
   };
   
-  export default Routing;`;
+  `;
 
     return routeContent;
   };
-  const createRouteFile = (routeContent: string) => {
+  const createMenuFile = (routeContent: string) => {
     const subToReturn = new BehaviorSubject<boolean>(false);
-    const filePath = `${reactDirPathForDownload}/Routing.tsx`;
+    const filePath = `${reactDirPathForDownload}/Menu.tsx`;
     const dirPath = path.dirname(filePath);
 
     // Create the directory structure if it doesn't exist
@@ -379,9 +410,17 @@ export function createEntireReactCode(
 
       createComponentFilesObservable.subscribe((response: boolean) => {
         if (response) {
-          updateAppFile(components).subscribe((resultEditAppFile: boolean) => {
+          updateAppFile().subscribe((resultEditAppFile: boolean) => {
             if (resultEditAppFile) {
-              subToReturn.next(true);
+              createRouting(components).subscribe(
+                (resultCreateRouting: boolean) => {
+                  if (resultCreateRouting) {
+                    subToReturn.next(true);
+                  } else {
+                    subToReturn.next(false);
+                  }
+                }
+              );
             } else {
               subToReturn.next(false);
             }
@@ -389,8 +428,8 @@ export function createEntireReactCode(
         }
       });
 
-      const routeContent = generateRouteFileContent();
-      const createrouteFileObservable = createRouteFile(routeContent);
+      const routeContent = generateMenuFileContent();
+      const createrouteFileObservable = createMenuFile(routeContent);
       createrouteFileObservable.subscribe((resultCreateRouterFile: boolean) => {
         if (resultCreateRouterFile) {
           console.log(`Router file created sucessfully}`);

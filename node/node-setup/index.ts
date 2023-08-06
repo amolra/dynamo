@@ -300,8 +300,8 @@ export function runNodemon(): Observable<boolean> {
   );
   return subToReturn.asObservable();
 }
-export function ApiSetting(): Observable<boolean> {
-  const subToReturn = new BehaviorSubject<boolean>(false);
+export function ApiSetting(): Observable<string> {
+  const subToReturn = new BehaviorSubject<string>('NotConfirm');
   createFolders('').subscribe((res: boolean) => {
     if (res) {
       changeDir(nodeDir).subscribe((result: boolean) => {
@@ -318,7 +318,7 @@ export function ApiSetting(): Observable<boolean> {
                             runNodemon().subscribe(
                               (resultcreateRunNodemon: boolean) => {
                                 if (resultcreateRunNodemon) {
-                                  subToReturn.next(true);
+                                  subToReturn.next('Confirmed');
                                 }
                               }
                             );
@@ -333,7 +333,7 @@ export function ApiSetting(): Observable<boolean> {
           });
         }
       });
-    } else subToReturn.next(false);
+    } else subToReturn.next('error');
   });
   return subToReturn.asObservable();
 }

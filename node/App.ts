@@ -135,6 +135,7 @@ app.post('/api-code-add', async (req, res) => {
   if (req.body.backTech === 'NodeJs') {
     const responseSetApi = await setApi(req.body.component);
     responseSetApi.subscribe((eleModCreate: string) => {
+      console.log('eleModCreate api-code-add', eleModCreate);
       if (eleModCreate !== 'NotConfirm') {
         const flag = eleModCreate !== 'error';
         if (res.headersSent !== true) {
