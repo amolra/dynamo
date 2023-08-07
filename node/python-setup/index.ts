@@ -1,19 +1,13 @@
-import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { exec } from "shelljs";
-import process from "process";
-import fs, { readFile, writeFile } from "fs";
-import {
-  baseDirName,
-  pythonDir,
-  basePath,
-  dir,
-  projectFolder,
-} from "../constants";
-import { fields } from "./interfaces/fields";
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { exec } from 'shelljs';
+import process from 'process';
+import fs, { readFile, writeFile } from 'fs';
+import { baseDirName, basePath, dir, projectFolder } from '../constants';
+import { fields } from './interfaces/fields';
 export function changeDir(dirName: string): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
-  console.log("change dir", basePath + baseDirName + "/" + dirName);
-  process.chdir(basePath + baseDirName + "/" + dirName);
+  console.log('change dir', basePath + baseDirName + '/' + dirName);
+  process.chdir(basePath + baseDirName + '/' + dirName);
   subToReturn.next(true);
   return subToReturn.asObservable();
 }
@@ -21,7 +15,7 @@ export function install(): Observable<boolean> {
   const subToReturn = new BehaviorSubject<boolean>(false);
 
   exec(
-    basePath + projectFolder + "/python-setup/install.sh",
+    basePath + projectFolder + '/python-setup/install.sh',
     (error, stdout, stderr) => {
       if (error) {
         console.log(`error: ${error}`);
@@ -39,11 +33,11 @@ export function install(): Observable<boolean> {
 }
 const createMain = (): Observable<boolean> => {
   const subToReturn = new BehaviorSubject<boolean>(false);
-  const mainPy = "./main.py";
+  const mainPy = './main.py';
   if (!fs.existsSync(mainPy)) {
-    fs.open(mainPy, "w", function (err, file) {
+    fs.open(mainPy, 'w', function (err, file) {
       if (err) throw err;
-      console.log("Saved!" + mainPy);
+      console.log('Saved!' + mainPy);
     });
 
     const contentQuery = `
@@ -105,7 +99,7 @@ async def get_item(name):
     item_dict.update({"price_with_tax": price_with_tax})
     return item_dict
     `;
-    writeFile(mainPy, contentQuery, "utf-8", function (err) {
+    writeFile(mainPy, contentQuery, 'utf-8', function (err) {
       console.log(err);
 
       subToReturn.next(true);
